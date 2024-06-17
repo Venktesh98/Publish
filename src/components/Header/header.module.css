@@ -1,0 +1,9 @@
+.recommendedTopics {
+  display: flex;
+  margin: 3.5px;
+  float: left;
+}
+
+.antLayout {
+  background: white !important;
+}

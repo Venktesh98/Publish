@@ -1,0 +1,67 @@
+.allPostsContainer {
+  /* border: 1px solid blue; */
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.leftPanel {
+  width: 30%;
+  border: 1px solid green;
+}
+
+.middlePanel {
+  width: 60%;
+  border: 1px solid brown;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.avatar {
+  margin-top: -2%;
+}
+
+.userDetailsContainer {
+  display: flex;
+  flex-direction: column;
+  margin-top: -1%;
+}
+
+.userImageContainer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.popOverContent {
+  /* border: 1px solid green; */
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.joined {
+  font-size: 14px;
+  font-weight: 600;
+  color: gray;
+}
+
+.followBtn {
+  width: 100%;
+}
+
+.userStyle {
+  font-size: 12px !important;
+  margin-top: -1%;
+  cursor: pointer;
+}
+
+.postInfoContainer {
+  margin: 4% 0 0 9%;
+}
+
+.rightPanel {
+  width: 30%;
+  border: 1px solid grey;
+}
