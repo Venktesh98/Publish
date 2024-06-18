@@ -6,7 +6,7 @@ import { CommentOutlined, UserOutlined } from "@ant-design/icons";
 import { Avatar, Button, Card, Typography } from "antd";
 import ImageControl from "../shared/ImageControl";
 import PopOverControl from "../shared/PopOverControl";
-import LeftPanel from "./leftPanel";
+import LeftPanel from "./LeftPanel";
 import styles from "./posts.module.css";
 
 const AllPosts = ({ allPosts }: IAllPostsProps) => {
