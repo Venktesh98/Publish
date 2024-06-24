@@ -32,7 +32,6 @@
 }
 
 .popOverContent {
-  /* border: 1px solid green; */
   display: flex;
   flex-direction: column;
   gap: 15px;
@@ -60,5 +59,4 @@
 
 .rightPanel {
   width: 30%;
-  border: 1px solid grey;
 }

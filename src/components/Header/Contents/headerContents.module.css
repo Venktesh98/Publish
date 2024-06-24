@@ -8,7 +8,7 @@
 
 .subHeaderContents {
   margin: 0 auto;
-  width: 60%;
+  width: 70%;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -28,10 +28,5 @@
 .searchResultsCard {
   position: absolute;
   left: 23.5%;
-  top: 10%;
-}
-
-.postTitle.ant-typography {
-  /* margin-top: 0; */
-  border: 1px solid red;
+  z-index: 1;
 }
