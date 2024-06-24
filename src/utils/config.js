@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const API_URL = "http://localhost:8000/api/v1";
 const token =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NTgyMDFmZTdmY2QxMTU2Njk3MDJjNyIsImlhdCI6MTcxODYwNzMwMSwiZXhwIjoxNzE5MjEyMTAxfQ.WY0HrRGwsKhgxi0ySpz2Ne2QFFor7Aq8HoJL9Uy-IaQ";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NTgyMDFmZTdmY2QxMTU2Njk3MDJjNyIsImlhdCI6MTcxOTIxMjM2OSwiZXhwIjoxNzE5ODE3MTY5fQ.me6uMg0DSuEG38-3yK04965DIjzLfbCrQt-_Qksnlcs";
 
 export const blogServiceAPI = axios.create({
   baseURL: `${API_URL}`,

@@ -43,7 +43,7 @@ const HeaderContents = () => {
                 placeholder="Search...."
                 allowClear
                 size="large"
-                style={{ width: 320 }}
+                style={{ width: 500 }}
                 onChange={handleOnSearch}
                 value={searchValue}
               />
@@ -61,16 +61,17 @@ const HeaderContents = () => {
 
       <div className={styles.searchResultsCard}>
         {searchValue.length > 0 && searchedPostResults.length > 0 && (
-          <Card bordered={false} style={{ width: 320 }}>
+          <Card
+            bordered={true}
+            style={{ minHeight: 350, width: 500, overflowY: "auto" }}
+          >
             {searchedPostResults.map((item) => (
               <>
                 <Text type="secondary">@{item.fullName}</Text>
                 <Title level={3} className={styles.postTitle}>
                   {item.title}
                 </Title>
-                <Text type="secondary">
-                  {/* {serializeDate(item.createdAt.toString())} */}
-                </Text>
+                <Text type="secondary"></Text>
               </>
             ))}
           </Card>

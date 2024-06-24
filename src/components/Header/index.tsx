@@ -1,11 +1,19 @@
 "use client";
 import { IAllPosts } from "@/interfaces/postsInterface";
 import { getAllPosts } from "@/services/services";
+<<<<<<< Updated upstream
 import { Layout, Typography } from "antd";
 import { useEffect, useState } from "react";
 import AllPosts from "../Posts";
 
 const HeaderComp = () => {
+=======
+import { Layout } from "antd";
+import { useEffect, useState } from "react";
+import AllPosts from "../Posts";
+
+const BlogRootComp = () => {
+>>>>>>> Stashed changes
   const { Content, Footer } = Layout;
 
   const [allPosts, setAllPosts] = useState<IAllPosts[]>([]);
@@ -57,7 +65,11 @@ const HeaderComp = () => {
       <Layout>
         <Content>
           <div>
+<<<<<<< Updated upstream
             <AllPosts allPosts={allPosts} />
+=======
+            <AllPosts allPosts={allPosts} isLoading={isLoading} />
+>>>>>>> Stashed changes
           </div>
         </Content>
         <Footer style={{ textAlign: "center" }}>
@@ -68,4 +80,4 @@ const HeaderComp = () => {
   );
 };
 
-export default HeaderComp;
+export default BlogRootComp;
