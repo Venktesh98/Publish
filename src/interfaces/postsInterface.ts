@@ -57,6 +57,7 @@ export interface IAllPosts {
 
 export interface IAllPostsProps {
   allPosts: IAllPosts[];
+  isLoading: boolean;
 }
 
 export interface ISearchPayload {

@@ -9,7 +9,7 @@ const ImageControl = (props: IImageProps) => {
         {...props}
         style={{
           ...(props.photo && !props.isCircle
-            ? { border: "1px solid black" }
+            ? { border: "1px solid white" }
             : props.photo && props.isCircle
             ? { borderRadius: "50px" }
             : { display: "none" }),

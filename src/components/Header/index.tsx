@@ -1,11 +1,11 @@
 "use client";
 import { IAllPosts } from "@/interfaces/postsInterface";
 import { getAllPosts } from "@/services/services";
-import { Layout, Typography } from "antd";
+import { Layout } from "antd";
 import { useEffect, useState } from "react";
 import AllPosts from "../Posts";
 
-const HeaderComp = () => {
+const BlogRootComp = () => {
   const { Content, Footer } = Layout;
 
   const [allPosts, setAllPosts] = useState<IAllPosts[]>([]);
@@ -57,7 +57,7 @@ const HeaderComp = () => {
       <Layout>
         <Content>
           <div>
-            <AllPosts allPosts={allPosts} />
+            <AllPosts allPosts={allPosts} isLoading={isLoading} />
           </div>
         </Content>
         <Footer style={{ textAlign: "center" }}>
@@ -68,4 +68,4 @@ const HeaderComp = () => {
   );
 };
 
-export default HeaderComp;
+export default BlogRootComp;

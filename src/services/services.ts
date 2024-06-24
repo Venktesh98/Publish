@@ -14,7 +14,18 @@ export const getAllPosts = async (currentPage: number) => {
 
 export const getSearchedPosts = async (payload: ISearchPayload) => {
   const { data } = await blogServiceAPI.post("/posts/search-posts", payload);
-  console.log("Data:", data);
+
+  return data.data;
+};
+
+export const followAUser = async (userId: string) => {
+  const { data } = await blogServiceAPI.get(`/users/following/${userId}`);
+
+  return data.data;
+};
+
+export const fetchAllUsers = async () => {
+  const { data } = await blogServiceAPI.get("users");
 
   return data.data;
 };
