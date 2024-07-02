@@ -55,7 +55,7 @@ const PublishAllPosts = ({ allPosts, isLoading }: IAllPostsProps) => {
         <div>
           <div className={styles.joined}>JOINED</div>
           <div>
-            {serializeDate(userDetails.createdAt).formattedDateWithYear}
+            {serializeDate(userDetails?.createdAt).formattedDateWithYear}
           </div>
         </div>
       </div>
@@ -78,7 +78,7 @@ const PublishAllPosts = ({ allPosts, isLoading }: IAllPostsProps) => {
             <Card style={{ marginBottom: "8px" }}>
               <ImageControl
                 src={postItem.photo ?? "/"}
-                layout="responsive"
+                // layout="responsive"
                 alt=""
                 width={550}
                 height={350}
@@ -86,7 +86,7 @@ const PublishAllPosts = ({ allPosts, isLoading }: IAllPostsProps) => {
               />
               <div>
                 <div className={styles.userImageContainer}>
-                  {postItem.user.profilePhoto ? (
+                  {postItem?.user?.profilePhoto ? (
                     <ImageControl
                       src={postItem.user.profilePhoto ?? "/"}
                       alt=""
@@ -104,15 +104,15 @@ const PublishAllPosts = ({ allPosts, isLoading }: IAllPostsProps) => {
                   <div className={styles.userDetailsContainer}>
                     <Text strong className={styles.userStyle}>
                       <PopOverControl
-                        title={postItem.user.fullName}
+                        title={postItem?.user?.fullName}
                         content={popOverContent(postItem?.user)}
                       >
-                        {postItem.user.fullName}
+                        {postItem?.user?.fullName}
                       </PopOverControl>
                     </Text>
                     <Text type="secondary" className={styles.userStyle}>{`${
-                      serializeDate(postItem.createdAt).formattedDate
-                    } (${postItem.daysAgo})`}</Text>
+                      serializeDate(postItem?.createdAt).formattedDate
+                    } (${postItem?.daysAgo})`}</Text>
                   </div>
                 </div>
               </div>
@@ -121,9 +121,9 @@ const PublishAllPosts = ({ allPosts, isLoading }: IAllPostsProps) => {
                 <Title level={4}>{postItem.title}</Title>
 
                 <div className={styles.commentsContainer}>
-                  {postItem.comments.length ? (
+                  {postItem?.comments?.length ? (
                     <Button type="text">
-                      <CommentOutlined /> {showComments(postItem.comments)}
+                      <CommentOutlined /> {showComments(postItem?.comments)}
                     </Button>
                   ) : (
                     <Button type="text">

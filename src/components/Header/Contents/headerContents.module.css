@@ -4,6 +4,10 @@
   height: 60px;
   display: flex;
   align-items: center;
+  /* border: 1px solid; */
+  position: fixed;
+  z-index: 100;
+  top: 0;
 }
 
 .subHeaderContents {
@@ -27,6 +31,30 @@
 
 .searchResultsCard {
   position: absolute;
-  left: 23.5%;
+  left: 18.5%;
+  top: 6%;
   z-index: 1;
+}
+
+.createPostContainer {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.avatar {
+  cursor: pointer;
+}
+
+.authUserContents {
+  width: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.authUserContents > div {
+  cursor: pointer;
+  font-size: 15px;
+  letter-spacing: 0.5px;
 }

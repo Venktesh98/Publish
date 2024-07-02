@@ -1,0 +1,16 @@
+.signupContainer {
+  margin: 0 auto;
+  width: 50%;
+  margin-top: 5%;
+}
+
+.mainText {
+  text-align: center;
+}
+
+.subText {
+  text-align: center;
+  font-size: 12px;
+  color: gray;
+}
+
