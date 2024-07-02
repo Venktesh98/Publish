@@ -2,6 +2,6 @@ import React, { ReactNode } from "react";
 
 export interface IPopOverProps {
   children: React.ReactNode;
-  title: string;
+  title?: string;
   content: ReactNode;
 }

@@ -1,22 +1,68 @@
 "use client";
-import { ISearchedPostResults } from "@/interfaces/postsInterface";
-import { getSearchedPosts } from "@/services/services";
-import { Button, Card, Input, Typography } from "antd";
+import PopOverControl from "@/components/shared/PopOverControl";
+import {
+  ISearchedPostResults,
+  IUserDetails,
+} from "@/interfaces/postsInterface";
+import { fetchAllUsers, getSearchedPosts } from "@/services/services";
+import {
+  EditTwoTone,
+  LoginOutlined,
+  LogoutOutlined,
+  UpOutlined,
+} from "@ant-design/icons";
+import { Avatar, Button, Card, Input, Typography } from "antd";
+import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import styles from "./headerContents.module.css";
-import { EditTwoTone } from "@ant-design/icons";
 
 const HeaderContents = () => {
   const { Title, Text } = Typography;
+
+  const router = useRouter();
+  const { id } = useParams();
 
   const [searchValue, setSearchValue] = useState<string>("");
   const [searchedPostResults, setSearchedPostResults] = useState<
     ISearchedPostResults[]
   >([]);
+  const [userDetails, setUserDetails] = useState<IUserDetails | null>(null);
 
   const handleOnSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     setSearchValue(value);
+  };
+
+  const handleUserRegister = () => {
+    router.push("/signup");
+  };
+
+  const handleRedirectToUserLogin = () => {
+    sessionStorage.removeItem("token");
+    router.push("/signin");
+  };
+
+  const popOverContent = () => {
+    const token = sessionStorage.getItem("token");
+
+    if (token) {
+      return (
+        <div onClick={handleRedirectToUserLogin}>
+          <LogoutOutlined /> Logout
+        </div>
+      );
+    } else {
+      return (
+        <div className={styles.authUserContents}>
+          <div onClick={handleUserRegister}>
+            <UpOutlined /> Register
+          </div>
+          <div onClick={handleRedirectToUserLogin}>
+            <LoginOutlined /> Login
+          </div>
+        </div>
+      );
+    }
   };
 
   useEffect(() => {
@@ -31,6 +77,18 @@ const HeaderContents = () => {
       return () => clearTimeout(debounce);
     }
   }, [searchValue]);
+
+  useEffect(() => {
+    (async () => {
+      const allUsers = await fetchAllUsers();
+      console.log("alluser", allUsers);
+
+      const userDetails = allUsers.find(
+        (userObj: IUserDetails) => userObj._id === id
+      );
+      setUserDetails(userDetails);
+    })();
+  }, []);
 
   return (
     <>
@@ -50,11 +108,25 @@ const HeaderContents = () => {
             </div>
           </div>
 
-          <div>
-            <Button type="default" size={"large"}>
-              <EditTwoTone style={{ fontSize: "17px" }} />
-              Create Post
-            </Button>
+          <div className={styles.createPostContainer}>
+            <div>
+              <Button type="default" size={"large"}>
+                <EditTwoTone style={{ fontSize: "17px" }} />
+                Create Post
+              </Button>
+            </div>
+
+            <div>
+              <Avatar className={styles.avatar}>
+                <PopOverControl content={popOverContent()}>
+                  {userDetails?.profilePhoto ? (
+                    <img src={userDetails?.profilePhoto} />
+                  ) : (
+                    userDetails?.firstName[0]
+                  )}
+                </PopOverControl>
+              </Avatar>
+            </div>
           </div>
         </div>
       </div>

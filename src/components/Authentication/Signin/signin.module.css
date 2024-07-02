@@ -1,0 +1,28 @@
+.signinCard {
+  width: 28% !important;
+  margin: 30px auto 0 auto !important;
+}
+
+.loginContainer {
+  margin: 7px 20px 0;
+}
+
+.login {
+  width: 450px;
+}
+
+.divider {
+  height: 1px;
+  margin: 8px 0px;
+  background-color: rgb(234 234 234);
+  border: none;
+}
+
+.createAccount {
+  text-align: center;
+}
+
+.rememberContainer {
+  display: flex;
+  justify-content: space-between;
+}

@@ -1,0 +1,37 @@
+.signupCard {
+  width: 28% !important;
+  margin: 10px auto 0 auto !important;
+}
+
+.registrationContainer {
+  margin: 7px 20px 0;
+}
+
+.submitBtn {
+  text-align: center;
+}
+
+.agree {
+  font-size: 12px;
+  text-align: center;
+  margin: 10px auto 0;
+  width: 350px;
+  line-height: 1.5;
+  font-style: italic;
+  color: gray;
+}
+
+.agree > span {
+  color: blue;
+}
+
+.login {
+  text-align: center;
+}
+
+.divider {
+  height: 1px;
+  margin: 15px 0px;
+  background-color: rgb(234 234 234);
+  border: none;
+}

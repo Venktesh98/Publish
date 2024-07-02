@@ -1,20 +1,9 @@
 "use client";
-
-<<<<<<< Updated upstream
-import { IAllPostsProps, IUserDetails } from "@/interfaces/postsInterface";
-import { serializeDate } from "@/utils/helpers";
-import { CommentOutlined, UserOutlined } from "@ant-design/icons";
-import { Avatar, Button, Card, Typography } from "antd";
-import ImageControl from "../shared/ImageControl";
-import PopOverControl from "../shared/PopOverControl";
-import LeftPanel from "./LeftPanel";
-=======
 import { IAllPostsProps } from "@/interfaces/postsInterface";
-import LeftPanel from "../LeftPanel";
-import RightPanel from "../RightPanel";
 import PublishAllPosts from "./PublishAllPosts";
->>>>>>> Stashed changes
 import styles from "./posts.module.css";
+import LeftPanel from "./LeftPanel";
+import RightPanel from "./RightPanel";
 
 const AllPosts = ({ allPosts, isLoading }: IAllPostsProps) => {
   return (

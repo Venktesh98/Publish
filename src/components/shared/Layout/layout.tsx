@@ -11,11 +11,7 @@ export default function Layout() {
         <HeaderContents />
       </MainHeader>
       <main className={styles.main}>
-<<<<<<< Updated upstream
-        <HeaderComp />
-=======
         <BlogRootComp />
->>>>>>> Stashed changes
       </main>
     </div>
   );
