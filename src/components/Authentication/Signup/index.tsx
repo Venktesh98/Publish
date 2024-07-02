@@ -62,8 +62,11 @@ const PublishSignup = () => {
   };
 
   const handleImageUpload = (info: UploadChangeParam) => {
+    console.log("info:", info);
+
     if (info.file.status === "done") {
-      setFileList(info.fileList);
+      //   setFileList(info.fileList);
+      //   setFileList(info.file);
       message.success(`${info.file.name} file uploaded successfully`);
     } else if (info.file.status === "error") {
       message.error(`${info.file.name} file upload failed.`);
@@ -134,7 +137,13 @@ const PublishSignup = () => {
             </Form.Item>
 
             <Form.Item>
-              <Upload listType="picture" onChange={handleImageUpload}>
+              <Upload
+                name="file"
+                listType="picture"
+                onChange={handleImageUpload}
+                // fileList={fileList}
+                // beforeUpload={() => false}
+              >
                 <Button icon={<UploadOutlined />}>Upload</Button>
               </Upload>
             </Form.Item>
@@ -144,7 +153,7 @@ const PublishSignup = () => {
                 type="primary"
                 htmlType="submit"
                 loading={isLoading}
-                style={{ width: 450 }}
+                style={{ width: "100%" }}
               >
                 Signup
               </Button>

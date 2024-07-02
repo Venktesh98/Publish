@@ -1,16 +1,15 @@
 "use client";
 import JoinCommunityText from "@/components/shared/JoinCommunityText";
 import { ILoginFormValues } from "@/interfaces/formInterface";
+import { loginUser } from "@/services/services";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, Card, Checkbox, Flex, Form, Input, message } from "antd";
 import Link from "next/link";
-import styles from "./signin.module.css";
-import { loginUser } from "@/services/services";
 import { useRouter } from "next/navigation";
+import styles from "./signin.module.css";
 
 const PublishSignIn = () => {
   const router = useRouter();
-  console.log("Rouetr:", router);
 
   const handleFormLogin = async (values: ILoginFormValues) => {
     try {
@@ -59,8 +58,12 @@ const PublishSignIn = () => {
               </Form.Item>
             </Form.Item>
 
-            <Form.Item>
-              <Button type="primary" htmlType="submit" className={styles.login}>
+            <Form.Item className={styles.login}>
+              <Button
+                type="primary"
+                htmlType="submit"
+                style={{ width: "100%" }}
+              >
                 Log in
               </Button>
             </Form.Item>

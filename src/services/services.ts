@@ -1,9 +1,12 @@
-import { ILoginFormValues, ISubmitSignupFormValues } from "@/interfaces/formInterface";
+import {
+  ILoginFormValues,
+  ISubmitSignupFormValues,
+} from "@/interfaces/formInterface";
 import { ISearchPayload } from "@/interfaces/postsInterface";
 import { blogServiceAPI, blogServiceUserRegisterAPI } from "@/utils/config";
 
 export const getAllPosts = async (currentPage: number) => {
-  const { data } = await blogServiceAPI.get(
+  const { data } = await blogServiceAPI?.get(
     `/posts?page=${currentPage}&pageSize=${10}`
   );
 
@@ -22,7 +25,13 @@ export const getSearchedPosts = async (payload: ISearchPayload) => {
 export const followAUser = async (userId: string) => {
   const { data } = await blogServiceAPI.get(`/users/following/${userId}`);
 
-  return data.data;
+  return data;
+};
+
+export const unFollowAUser = async (userId: string) => {
+  const { data } = await blogServiceAPI.get(`/users/unfollow/${userId}`);
+
+  return data;
 };
 
 export const fetchAllUsers = async () => {
@@ -41,10 +50,7 @@ export const registerUser = async (payload: ISubmitSignupFormValues) => {
 };
 
 export const loginUser = async (payload: ILoginFormValues) => {
-  const { data } = await blogServiceAPI.post(
-    "/users/login",
-    payload
-  );
+  const { data } = await blogServiceAPI.post("/users/login", payload);
 
   return data.data;
 };

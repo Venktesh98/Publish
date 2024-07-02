@@ -48,6 +48,11 @@
   width: 100%;
 }
 
+.followBtn > span {
+  letter-spacing: 0.7px;
+  font-weight: 500;
+}
+
 .userStyle {
   font-size: 12px !important;
   margin-top: -1%;

@@ -1,5 +1,5 @@
 "use client";
-import PopOverControl from "@/components/shared/PopOverControl";
+import { BlogCtx } from "@/context/blogContext";
 import {
   ISearchedPostResults,
   IUserDetails,
@@ -12,9 +12,10 @@ import {
   UpOutlined,
 } from "@ant-design/icons";
 import { Avatar, Button, Card, Input, Typography } from "antd";
-import { useRouter, useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useContext, useEffect, useState } from "react";
 import styles from "./headerContents.module.css";
+import PopOverControl from "@/components/shared/PopOverControl";
 
 const HeaderContents = () => {
   const { Title, Text } = Typography;
@@ -26,7 +27,8 @@ const HeaderContents = () => {
   const [searchedPostResults, setSearchedPostResults] = useState<
     ISearchedPostResults[]
   >([]);
-  const [userDetails, setUserDetails] = useState<IUserDetails | null>(null);
+
+  const { userDetails, setUserDetails, setAllUsers } = useContext(BlogCtx);
 
   const handleOnSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
@@ -47,7 +49,7 @@ const HeaderContents = () => {
 
     if (token) {
       return (
-        <div onClick={handleRedirectToUserLogin}>
+        <div onClick={handleRedirectToUserLogin} className={styles.logout}>
           <LogoutOutlined /> Logout
         </div>
       );
@@ -81,12 +83,12 @@ const HeaderContents = () => {
   useEffect(() => {
     (async () => {
       const allUsers = await fetchAllUsers();
-      console.log("alluser", allUsers);
 
       const userDetails = allUsers.find(
         (userObj: IUserDetails) => userObj._id === id
       );
       setUserDetails(userDetails);
+      setAllUsers(allUsers);
     })();
   }, []);
 

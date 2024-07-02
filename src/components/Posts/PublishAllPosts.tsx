@@ -1,37 +1,51 @@
 "use client";
 import { IAllPostsProps, IUserDetails } from "@/interfaces/postsInterface";
-import { fetchAllUsers, followAUser } from "@/services/services";
+import { followAUser, unFollowAUser } from "@/services/services";
 import { serializeDate } from "@/utils/helpers";
 import { CommentOutlined, UserOutlined } from "@ant-design/icons";
 import { Avatar, Button, Card, Skeleton, Space, Typography } from "antd";
+import { useParams } from "next/navigation";
+import { useState } from "react";
 import ImageControl from "../shared/ImageControl";
 import PopOverControl from "../shared/PopOverControl";
 import styles from "./posts.module.css";
-import { useState } from "react";
+import { UserEnumValues } from "@/utils/constants";
 
 const PublishAllPosts = ({ allPosts, isLoading }: IAllPostsProps) => {
   const { Title, Text } = Typography;
 
-  // const [isUserAFollower, setIsUserAFollower] = useState<boolean>(false);
+  const [isUserFollowed, setIsUserFollowed] = useState<boolean>(false);
+  const [userWhoFollowed, setUserWhoFollowed] = useState("");
 
-  // const handleFollowAUser = async (userId: string) => {
-  //   try {
-  //     const data = await followAUser(userId);
-  //     if (data.status === 200) {
-  //       // fetch all users
-  //       // const usersData = await fetchAllUsers();
-  //       // look for the loggedIn user
-  //       // const isUserAFollower = usersData.some((userObj: IUserDetails) =>
-  //       //   userObj.followers.includes(userId)
-  //       // );
-  //       // check the user who we followed
-  //       // once found check the loggedIn user id exists in the followers array
-  //       // setIsUserAFollower(isUserAFollower);
-  //     }
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
+  const { id } = useParams();
+  let isUserAFollower;
+
+  const handleFollowAUser = async (userIdOfUserToFollow: string) => {
+    try {
+      const data = await followAUser(userIdOfUserToFollow);
+      if (data.status === 200) {
+        setIsUserFollowed(true);
+        setUserWhoFollowed(userIdOfUserToFollow);
+        showFollowUnFollowBtn(userIdOfUserToFollow, "");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleUnFollowAUser = async (userIdOfUserToUnFollow: string) => {
+    console.log("In unfollow");
+    try {
+      const data = await unFollowAUser(userIdOfUserToUnFollow);
+      if (data.status === 200) {
+        setIsUserFollowed(false);
+        setUserWhoFollowed(userIdOfUserToUnFollow);
+        showFollowUnFollowBtn(userIdOfUserToUnFollow, "");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const showComments = (comments: string[]) => {
     if (comments.length > 1) {
@@ -41,16 +55,19 @@ const PublishAllPosts = ({ allPosts, isLoading }: IAllPostsProps) => {
   };
 
   const popOverContent = (userDetails: IUserDetails) => {
+    if (
+      userDetails?._id !== id &&
+      userDetails?.followers?.includes(id as string)
+    ) {
+      isUserAFollower = UserEnumValues.UNFOLLOW;
+    } else {
+      isUserAFollower = UserEnumValues.FOLLOW;
+    }
+
     return (
       <div className={styles.popOverContent}>
-        <Button
-          className={styles.followBtn}
-          type="primary"
-          // onClick={() => handleFollowAUser(userDetails._id)}
-        >
-          {/* {isUserAFollower ? "Follow" : "Unfollow"} */}
-          Follow
-        </Button>
+        {userDetails?._id !== id &&
+          showFollowUnFollowBtn(userDetails?._id, isUserAFollower)}
 
         <div>
           <div className={styles.joined}>JOINED</div>
@@ -59,6 +76,32 @@ const PublishAllPosts = ({ allPosts, isLoading }: IAllPostsProps) => {
           </div>
         </div>
       </div>
+    );
+  };
+
+  const showFollowUnFollowBtn = (userId: string, text: string) => {
+    return (
+      <Button className={styles.followBtn} type="primary">
+        {isUserFollowed && userId === userWhoFollowed ? (
+          <span onClick={() => handleUnFollowAUser(userId)}>
+            {UserEnumValues.UNFOLLOW}
+          </span>
+        ) : !isUserFollowed && userId === userWhoFollowed ? (
+          <span onClick={() => handleFollowAUser(userId)}>
+            {UserEnumValues.FOLLOW}
+          </span>
+        ) : (
+          <span
+            onClick={
+              text === UserEnumValues.UNFOLLOW
+                ? () => handleUnFollowAUser(userId)
+                : () => handleFollowAUser(userId)
+            }
+          >
+            {text}
+          </span>
+        )}
+      </Button>
     );
   };
 
@@ -77,12 +120,12 @@ const PublishAllPosts = ({ allPosts, isLoading }: IAllPostsProps) => {
           <div key={postItem.id}>
             <Card style={{ marginBottom: "8px" }}>
               <ImageControl
-                src={postItem.photo ?? "/"}
+                src={postItem?.photo ?? "/"}
                 // layout="responsive"
                 alt=""
-                width={550}
-                height={350}
-                photo={postItem.photo}
+                width={610}
+                height={370}
+                photo={postItem?.photo}
               />
               <div>
                 <div className={styles.userImageContainer}>
