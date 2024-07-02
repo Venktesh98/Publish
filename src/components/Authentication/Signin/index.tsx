@@ -1,5 +1,5 @@
 "use client";
-import JoinCommunityText from "@/components/shared/JoinCommunityText";
+import JoinCommunityText from "@/components/shared/JoinCommunity";
 import { ILoginFormValues } from "@/interfaces/formInterface";
 import { loginUser } from "@/services/services";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";

@@ -14,6 +14,7 @@ export interface IUserDetails {
   viewers: string[];
   followers: string[];
   following: string[];
+  isUserFollowed: boolean;
   posts: string[];
   blockedUsers: string[];
   userAward: string;
@@ -56,7 +57,6 @@ export interface IAllPosts {
 }
 
 export interface IAllPostsProps {
-  allPosts: IAllPosts[];
   isLoading: boolean;
 }
 

@@ -2,13 +2,14 @@
 import { IAllPosts } from "@/interfaces/postsInterface";
 import { getAllPosts } from "@/services/services";
 import { Layout } from "antd";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import AllPosts from "../Posts";
+import { BlogCtx } from "@/context/blogContext";
 
 const BlogRootComp = () => {
   const { Content, Footer } = Layout;
 
-  const [allPosts, setAllPosts] = useState<IAllPosts[]>([]);
+  const { setAllPosts, allPosts } = useContext(BlogCtx);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [pageNumber, setPageNumber] = useState<number>(0);
   const [isLastPage, setIsLastPage] = useState<boolean>(false);
@@ -56,7 +57,7 @@ const BlogRootComp = () => {
       <Layout>
         <Content>
           <div>
-            <AllPosts allPosts={allPosts} isLoading={isLoading} />
+            <AllPosts isLoading={isLoading} />
           </div>
         </Content>
         <Footer style={{ textAlign: "center" }}>

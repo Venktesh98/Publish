@@ -1,6 +1,4 @@
 "use client";
-import JoinCommunityText from "@/components/shared/JoinCommunityText";
-import { ISubmitSignupFormValues } from "@/interfaces/formInterface";
 import { registerUser } from "@/services/services";
 import {
   LockOutlined,
@@ -14,6 +12,8 @@ import { UploadChangeParam } from "antd/es/upload";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import styles from "./signup.module.css";
+import { ISubmitSignupFormValues } from "@/interfaces/formInterface";
+import JoinCommunityText from "@/components/shared/JoinCommunity";
 
 type FieldType = {
   firstName: string;

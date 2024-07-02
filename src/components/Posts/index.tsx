@@ -5,7 +5,7 @@ import styles from "./posts.module.css";
 import LeftPanel from "./LeftPanel";
 import RightPanel from "./RightPanel";
 
-const AllPosts = ({ allPosts, isLoading }: IAllPostsProps) => {
+const AllPosts = ({ isLoading }: IAllPostsProps) => {
   return (
     <section className={styles.allPostsContainer}>
       <div className={styles.leftPanel}>
@@ -13,7 +13,7 @@ const AllPosts = ({ allPosts, isLoading }: IAllPostsProps) => {
       </div>
 
       <div className={styles.middlePanel}>
-        <PublishAllPosts allPosts={allPosts} isLoading={isLoading} />
+        <PublishAllPosts isLoading={isLoading} />
       </div>
 
       <div className={styles.rightPanel}>
