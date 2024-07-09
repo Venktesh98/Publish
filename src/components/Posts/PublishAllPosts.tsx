@@ -1,37 +1,75 @@
 "use client";
-import { IAllPostsProps, IUserDetails } from "@/interfaces/postsInterface";
-import { fetchAllUsers, followAUser } from "@/services/services";
+import { BlogCtx } from "@/context/blogContext";
+import {
+  IAllPosts,
+  IAllPostsProps,
+  IUserDetails,
+} from "@/interfaces/postsInterface";
+import {
+  deleteAPost,
+  followAUser,
+  getAllPosts,
+  unFollowAUser,
+} from "@/services/services";
+import { UserEnumValues } from "@/utils/constants";
 import { serializeDate } from "@/utils/helpers";
-import { CommentOutlined, UserOutlined } from "@ant-design/icons";
-import { Avatar, Button, Card, Skeleton, Space, Typography } from "antd";
+import { CommentOutlined, MoreOutlined, UserOutlined } from "@ant-design/icons";
+import {
+  Avatar,
+  Button,
+  Card,
+  Empty,
+  Menu,
+  Popover,
+  Skeleton,
+  Space,
+  Typography,
+  message,
+} from "antd";
+import { useParams } from "next/navigation";
+import { useContext, useState } from "react";
 import ImageControl from "../shared/ImageControl";
 import PopOverControl from "../shared/PopOverControl";
 import styles from "./posts.module.css";
-import { useState } from "react";
 
-const PublishAllPosts = ({ allPosts, isLoading }: IAllPostsProps) => {
+const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
   const { Title, Text } = Typography;
 
-  // const [isUserAFollower, setIsUserAFollower] = useState<boolean>(false);
+  const {
+    allPosts,
+    setAllPosts,
+    pageNumber,
+    setIsModalOpen,
+    userDetails,
+    setSinglePostDetails,
+    setIsEditMode,
+  } = useContext(BlogCtx);
 
-  // const handleFollowAUser = async (userId: string) => {
-  //   try {
-  //     const data = await followAUser(userId);
-  //     if (data.status === 200) {
-  //       // fetch all users
-  //       // const usersData = await fetchAllUsers();
-  //       // look for the loggedIn user
-  //       // const isUserAFollower = usersData.some((userObj: IUserDetails) =>
-  //       //   userObj.followers.includes(userId)
-  //       // );
-  //       // check the user who we followed
-  //       // once found check the loggedIn user id exists in the followers array
-  //       // setIsUserAFollower(isUserAFollower);
-  //     }
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
+  const { id } = useParams();
+
+  const handleFollowAUser = async (userIdOfUserToFollow: string) => {
+    try {
+      const data = await followAUser(userIdOfUserToFollow);
+      if (data.status === 200) {
+        const fetchedPosts = await getAllPosts(pageNumber);
+        setAllPosts(fetchedPosts.data);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleUnFollowAUser = async (userIdOfUserToUnFollow: string) => {
+    try {
+      const data = await unFollowAUser(userIdOfUserToUnFollow);
+      if (data.status === 200) {
+        const fetchedPosts = await getAllPosts(pageNumber);
+        setAllPosts(fetchedPosts.data);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const showComments = (comments: string[]) => {
     if (comments.length > 1) {
@@ -40,24 +78,70 @@ const PublishAllPosts = ({ allPosts, isLoading }: IAllPostsProps) => {
     return `${comments.length} comment`;
   };
 
-  const popOverContent = (userDetails: IUserDetails) => {
+  const formatJoinedDate = (userDetails: IUserDetails) => {
     return (
-      <div className={styles.popOverContent}>
-        <Button
-          className={styles.followBtn}
-          type="primary"
-          // onClick={() => handleFollowAUser(userDetails._id)}
-        >
-          {/* {isUserAFollower ? "Follow" : "Unfollow"} */}
-          Follow
-        </Button>
+      <div>
+        <div className={styles.joined}>JOINED</div>
+        <div>{serializeDate(userDetails?.createdAt).formattedDateWithYear}</div>
+      </div>
+    );
+  };
 
-        <div>
-          <div className={styles.joined}>JOINED</div>
-          <div>
-            {serializeDate(userDetails?.createdAt).formattedDateWithYear}
-          </div>
+  const popOverContent = (userDetails: IUserDetails) => {
+    if (userDetails?.followers?.includes(id as string)) {
+      return (
+        <div className={styles.popOverContent}>
+          {userDetails?._id !== id && (
+            <Button
+              type="primary"
+              className={styles.followBtn}
+              onClick={() => handleUnFollowAUser(userDetails._id)}
+            >
+              {UserEnumValues.UNFOLLOW}
+            </Button>
+          )}
+          {formatJoinedDate(userDetails)}
         </div>
+      );
+    } else {
+      return (
+        <div className={styles.popOverContent}>
+          {userDetails?._id !== id && (
+            <Button
+              type="primary"
+              className={styles.followBtn}
+              onClick={() => handleFollowAUser(userDetails._id)}
+            >
+              {UserEnumValues.FOLLOW}
+            </Button>
+          )}
+
+          {formatJoinedDate(userDetails)}
+        </div>
+      );
+    }
+  };
+
+  const handleDeletePost = async (postId: string) => {
+    const data = await deleteAPost(postId);
+    if (data.status === 200) {
+      message.success("Post Deleted");
+      const fetchedPosts = await getAllPosts(pageNumber);
+      setAllPosts(fetchedPosts.data);
+    }
+  };
+
+  const handleEdit = (postDetails: IAllPosts) => {
+    setSinglePostDetails(postDetails);
+    setIsModalOpen(true);
+    setIsEditMode(true);
+  };
+
+  const menuItemContent = (postItem: IAllPosts) => {
+    return (
+      <div className={styles.menuItemContents}>
+        <p onClick={() => handleEdit(postItem)}>Edit</p>
+        <p onClick={() => handleDeletePost(postItem._id)}>Delete</p>
       </div>
     );
   };
@@ -72,19 +156,30 @@ const PublishAllPosts = ({ allPosts, isLoading }: IAllPostsProps) => {
             </Card>
           ))}
         </Space>
+      ) : !allPosts ? (
+        <>
+          <Empty
+            image="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg"
+            imageStyle={{ height: 60 }}
+          >
+            <Button type="primary" onClick={() => setIsModalOpen(true)}>
+              Create Now
+            </Button>
+          </Empty>
+        </>
       ) : (
-        allPosts.map((postItem) => (
+        allPosts.map((postItem: IAllPosts) => (
           <div key={postItem.id}>
             <Card style={{ marginBottom: "8px" }}>
               <ImageControl
                 src={postItem.photo ?? "/"}
                 // layout="responsive"
                 alt=""
-                width={550}
+                width={610}
                 height={350}
                 photo={postItem.photo}
               />
-              <div>
+              <div className={styles.userSectionMain}>
                 <div className={styles.userImageContainer}>
                   {postItem?.user?.profilePhoto ? (
                     <ImageControl
@@ -115,10 +210,22 @@ const PublishAllPosts = ({ allPosts, isLoading }: IAllPostsProps) => {
                     } (${postItem?.daysAgo})`}</Text>
                   </div>
                 </div>
+
+                {userDetails?._id === postItem.user._id && (
+                  <div className={styles.menuItem}>
+                    <Popover
+                      placement="bottom"
+                      content={() => menuItemContent(postItem)}
+                      arrow={false}
+                    >
+                      <MoreOutlined />
+                    </Popover>
+                  </div>
+                )}
               </div>
 
               <div className={styles.postInfoContainer}>
-                <Title level={4}>{postItem.title}</Title>
+                <Title level={3}>{postItem.title}</Title>
 
                 <div className={styles.commentsContainer}>
                   {postItem?.comments?.length ? (

@@ -1,7 +1,10 @@
 "use client";
 import JoinCommunityText from "@/components/shared/JoinCommunityText";
-import { ISubmitSignupFormValues } from "@/interfaces/formInterface";
-import { registerUser } from "@/services/services";
+import {
+  IFileDetails,
+  ISubmitSignupFormValues,
+} from "@/interfaces/formInterface";
+import { imageUpload, registerUser } from "@/services/services";
 import {
   LockOutlined,
   MailOutlined,
@@ -61,12 +64,29 @@ const PublishSignup = () => {
     }
   };
 
-  const handleImageUpload = (info: UploadChangeParam) => {
-    if (info.file.status === "done") {
-      setFileList(info.fileList);
-      message.success(`${info.file.name} file uploaded successfully`);
-    } else if (info.file.status === "error") {
-      message.error(`${info.file.name} file upload failed.`);
+  const handleImageUpload = async (info: UploadChangeParam) => {
+    let newFileList = [...info.fileList];
+    setFileList(newFileList);
+
+    console.log("newFileList:", newFileList);
+
+    if (info.file.status === "removed") {
+      return;
+    }
+
+    if (info.file.status !== "uploading") {
+      const formData = new FormData();
+      newFileList.forEach((file: any) => {
+        formData.append("profile-pic", file.originFileObj);
+      });
+
+      try {
+        const response = await imageUpload(formData as unknown as IFileDetails);
+        message.success(response.message);
+        console.log(response.data);
+      } catch (error) {
+        message.error("Upload failed");
+      }
     }
   };
 
@@ -134,7 +154,13 @@ const PublishSignup = () => {
             </Form.Item>
 
             <Form.Item>
-              <Upload listType="picture" onChange={handleImageUpload}>
+              <Upload
+                listType="picture"
+                onChange={handleImageUpload}
+                fileList={fileList}
+                accept={".png,.jpeg,.jpg,.webp"}
+                beforeUpload={() => false}
+              >
                 <Button icon={<UploadOutlined />}>Upload</Button>
               </Upload>
             </Form.Item>
