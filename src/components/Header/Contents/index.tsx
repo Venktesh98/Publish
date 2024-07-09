@@ -1,23 +1,43 @@
 "use client";
+import RichTextEditor from "@/components/Posts/Editor";
+import ModalWindow from "@/components/shared/Modal";
 import PopOverControl from "@/components/shared/PopOverControl";
+import { BlogCtx } from "@/context/blogContext";
+import { INewPostPayload } from "@/interfaces/createPostInterface";
 import {
+  IAllPosts,
   ISearchedPostResults,
   IUserDetails,
 } from "@/interfaces/postsInterface";
-import { fetchAllUsers, getSearchedPosts } from "@/services/services";
+import {
+  createNewPost,
+  editAPost,
+  fetchAllUsers,
+  getAllPosts,
+  getSearchedPosts,
+} from "@/services/services";
 import {
   EditTwoTone,
   LoginOutlined,
   LogoutOutlined,
   UpOutlined,
 } from "@ant-design/icons";
-import { Avatar, Button, Card, Input, Typography } from "antd";
-import { useRouter, useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Avatar, Button, Card, Input, Typography, message } from "antd";
+import { useParams, useRouter } from "next/navigation";
+import { useContext, useEffect, useState } from "react";
 import styles from "./headerContents.module.css";
+
+const newPostInitialValues = {
+  title: "",
+  description: "",
+  descriptionHtmlText: "",
+  category: "",
+  image: "",
+};
 
 const HeaderContents = () => {
   const { Title, Text } = Typography;
+  const { TextArea } = Input;
 
   const router = useRouter();
   const { id } = useParams();
@@ -26,7 +46,23 @@ const HeaderContents = () => {
   const [searchedPostResults, setSearchedPostResults] = useState<
     ISearchedPostResults[]
   >([]);
-  const [userDetails, setUserDetails] = useState<IUserDetails | null>(null);
+  const [newPost, setNewPost] = useState<INewPostPayload>(newPostInitialValues);
+  const [value, setValue] = useState<string>(" ");
+
+  const {
+    userDetails,
+    setUserDetails,
+    setAllUsers,
+    setAllPosts,
+    setSinglePostDetails,
+    setIsModalOpen,
+    isModalOpen,
+    singlePostDetails,
+    allPosts,
+    isEditMode,
+    setIsEditMode,
+    setPageNumber,
+  } = useContext(BlogCtx);
 
   const handleOnSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
@@ -40,6 +76,87 @@ const HeaderContents = () => {
   const handleRedirectToUserLogin = () => {
     sessionStorage.removeItem("token");
     router.push("/signin");
+  };
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+    setNewPost({ ...newPostInitialValues });
+    setValue("");
+    setSinglePostDetails("");
+    if (isEditMode) {
+      setIsEditMode(false);
+    }
+  };
+
+  const handlePublishNewPost = async () => {
+    const payload = {
+      title: newPost.title,
+      description: newPost.description,
+      descriptionHtmlText: value,
+    };
+
+    try {
+      if (payload.title.length > 0 && payload.description.length > 0) {
+        const data = await createNewPost(payload);
+        if (data.status === 200) {
+          try {
+            const fetchedPosts = await getAllPosts(0);
+            setAllPosts([...fetchedPosts.data]);
+            setIsModalOpen(false);
+            message.success("Post Created");
+          } catch (error) {
+            console.log(error);
+          }
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setNewPost({ ...newPostInitialValues });
+      setValue("");
+    }
+  };
+
+  const handleEditPost = async () => {
+    const payload = {
+      title: newPost.title,
+      description: newPost.description,
+      descriptionHtmlText: value,
+    };
+
+    const data = await editAPost(singlePostDetails._id, payload);
+    if (data.status === 200) {
+      const fetchedPosts = await getAllPosts(0);
+      setAllPosts([...fetchedPosts.data]);
+      setPageNumber(0);
+      setIsModalOpen(false);
+      message.success("Post Updated");
+    }
+  };
+
+  const footerButtons = () => {
+    return isEditMode ? (
+      <Button key="submit" type="primary" onClick={handleEditPost}>
+        Update
+      </Button>
+    ) : (
+      <Button key="submit" type="primary" onClick={handlePublishNewPost}>
+        Publish
+      </Button>
+    );
+  };
+
+  const handlePostTitleChange = (
+    event: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    setNewPost({
+      ...newPost,
+      title: event.target.value,
+    });
   };
 
   const popOverContent = () => {
@@ -90,12 +207,25 @@ const HeaderContents = () => {
     })();
   }, []);
 
+  useEffect(() => {
+    if (Object.keys(singlePostDetails).length > 0) {
+      const postDetails = allPosts.find(
+        (post: IAllPosts) => post._id === singlePostDetails._id
+      );
+      setNewPost({
+        ...newPost,
+        title: postDetails?.title,
+      });
+      setValue(postDetails.descriptionHtmlText);
+    }
+  }, [singlePostDetails]);
+
   return (
     <>
       <div className={styles.mainHeader}>
         <div className={styles.subHeaderContents}>
           <div className={styles.searchContainer}>
-            <div>LOGO</div>
+            <div className={styles.logo}>PUBLISH</div>
             <div>
               <Input
                 placeholder="Search...."
@@ -110,7 +240,7 @@ const HeaderContents = () => {
 
           <div className={styles.createPostContainer}>
             <div>
-              <Button type="default" size={"large"}>
+              <Button type="default" size={"large"} onClick={handleOpenModal}>
                 <EditTwoTone style={{ fontSize: "17px" }} />
                 Create Post
               </Button>
@@ -149,6 +279,39 @@ const HeaderContents = () => {
           </Card>
         )}
       </div>
+
+      <ModalWindow
+        title={"Create Post"}
+        isModalOpen={isModalOpen}
+        handleCancel={handleCancel}
+        footerButtons={footerButtons}
+        width={1000}
+      >
+        <Card bordered={true}>
+          <div className={styles.postTitleContainer}>
+            <TextArea
+              className={styles.postTitle}
+              onChange={handlePostTitleChange}
+              placeholder="New Post Title...."
+              autoSize
+              value={newPost.title}
+              autoFocus
+            />
+          </div>
+
+          <div className={styles.coverImage}>
+            <Button size="large">Add Cover Image</Button>
+            <div></div>
+          </div>
+
+          <RichTextEditor
+            setNewPost={setNewPost}
+            newPost={newPost}
+            setValue={setValue}
+            value={value}
+          />
+        </Card>
+      </ModalWindow>
     </>
   );
 };

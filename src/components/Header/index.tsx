@@ -1,24 +1,24 @@
 "use client";
-import { IAllPosts } from "@/interfaces/postsInterface";
+import { BlogCtx } from "@/context/blogContext";
 import { getAllPosts } from "@/services/services";
 import { Layout } from "antd";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import AllPosts from "../Posts";
 
 const BlogRootComp = () => {
   const { Content, Footer } = Layout;
 
-  const [allPosts, setAllPosts] = useState<IAllPosts[]>([]);
+  const { setAllPosts, allPosts, pageNumber, setPageNumber } =
+    useContext(BlogCtx);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [pageNumber, setPageNumber] = useState<number>(0);
   const [isLastPage, setIsLastPage] = useState<boolean>(false);
+  const [isScrolled, setIsScrolled] = useState<boolean>(false);
 
   const fetchPosts = async () => {
     setIsLoading(true);
     try {
       const fetchedPosts = await getAllPosts(pageNumber);
       setAllPosts([...allPosts, ...fetchedPosts.data]);
-      setPageNumber((prev) => prev + 1);
       setIsLastPage(fetchedPosts.isLastPage);
     } catch (error) {
       console.log(error);
@@ -39,7 +39,11 @@ const BlogRootComp = () => {
     if (isLastPage) {
       return;
     }
-    fetchPosts();
+    setIsScrolled(true);
+    fetchPosts().then(() => {
+      window.scrollBy(0, 2);
+      setIsScrolled(false);
+    });
   };
 
   useEffect(() => {
@@ -50,6 +54,12 @@ const BlogRootComp = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [isLoading]);
+
+  useEffect(() => {
+    if (isScrolled) {
+      setPageNumber(pageNumber + 1);
+    }
+  }, [isScrolled]);
 
   return (
     <div>

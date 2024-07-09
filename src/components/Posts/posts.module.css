@@ -55,9 +55,33 @@
 }
 
 .postInfoContainer {
-  margin: 4% 0 0 9%;
+  margin: 4% 0 0 4%;
 }
 
 .rightPanel {
   width: 30%;
+}
+
+.userSectionMain {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.menuItem {
+  cursor: pointer;
+}
+
+.menuItemContainer {
+  width: 150px !important;
+}
+
+.menuItemContents {
+  width: 80px;
+}
+
+.menuItemContents > p {
+  font-size: 14px;
+  line-height: 2;
+  cursor: pointer;
 }
