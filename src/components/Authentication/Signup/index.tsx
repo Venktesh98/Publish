@@ -17,6 +17,7 @@ import { UploadChangeParam } from "antd/es/upload";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import styles from "./signup.module.css";
+import { useRouter } from "next/navigation";
 
 type FieldType = {
   firstName: string;
@@ -39,6 +40,8 @@ const PublishSignup = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const formRef = useRef<FormInstance>(null);
 
+  const router = useRouter();
+
   const handleFormSubmit = async (values: ISubmitSignupFormValues) => {
     const formData = new FormData();
     formData.append("firstName", values.firstName);
@@ -58,6 +61,7 @@ const PublishSignup = () => {
       message.success("Registered Successfully");
       setIsLoading(false);
       formRef?.current?.resetFields();
+      router.push("/signin");
     } catch (error: any) {
       message.error(error.response.data.message ?? "Something went wrong");
       setIsLoading(false);
@@ -67,8 +71,6 @@ const PublishSignup = () => {
   const handleImageUpload = async (info: UploadChangeParam) => {
     let newFileList = [...info.fileList];
     setFileList(newFileList);
-
-    console.log("newFileList:", newFileList);
 
     if (info.file.status === "removed") {
       return;
@@ -170,7 +172,7 @@ const PublishSignup = () => {
                 type="primary"
                 htmlType="submit"
                 loading={isLoading}
-                style={{ width: 450 }}
+                className={styles.signup}
               >
                 Signup
               </Button>

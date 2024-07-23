@@ -8,7 +8,7 @@
 }
 
 .login {
-  width: 450px;
+  width: 100%;
 }
 
 .divider {
@@ -25,4 +25,5 @@
 .rememberContainer {
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
