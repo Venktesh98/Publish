@@ -1,3 +1,5 @@
+import { IAllComments } from "./commentsInterface";
+
 interface ICategory {
   _id: string;
   title: string;
@@ -36,10 +38,11 @@ export interface IAllPosts {
   numOfViews: string[];
   likes: string[];
   disLikes: string[];
-  comments: string[];
+  comments: IAllComments[];
   _id: string;
   title: string;
   description: string;
+  descriptionHtmlText?: string;
   category: ICategory;
   user: IUserDetails;
   createdAt: string;
@@ -70,4 +73,12 @@ export interface ISearchedPostResults {
   fullName: string;
   category: ICategory;
   createdAt: string;
+}
+
+export interface IPopConfirmProps {
+  title: string;
+  description: string;
+  handleConfirm: () => void;
+  handleConfirmCancel: () => void;
+  children: React.ReactNode;
 }

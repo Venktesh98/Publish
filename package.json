@@ -13,6 +13,7 @@
     "@ant-design/nextjs-registry": "^1.0.0",
     "antd": "^5.19.0",
     "axios": "^1.7.2",
+    "html-react-parser": "^5.1.10",
     "next": "14.2.3",
     "react": "^18",
     "react-dom": "^18",

@@ -4,15 +4,10 @@ import ModalWindow from "@/components/shared/Modal";
 import PopOverControl from "@/components/shared/PopOverControl";
 import { BlogCtx } from "@/context/blogContext";
 import { INewPostPayload } from "@/interfaces/createPostInterface";
-import {
-  IAllPosts,
-  ISearchedPostResults,
-  IUserDetails,
-} from "@/interfaces/postsInterface";
+import { IAllPosts, ISearchedPostResults } from "@/interfaces/postsInterface";
 import {
   createNewPost,
   editAPost,
-  fetchAllUsers,
   getAllPosts,
   getSearchedPosts,
 } from "@/services/services";
@@ -22,7 +17,7 @@ import {
   LogoutOutlined,
   UpOutlined,
 } from "@ant-design/icons";
-import { Avatar, Button, Card, Input, Typography, message } from "antd";
+import { Avatar, Button, Card, Input, message } from "antd";
 import { useParams, useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import styles from "./headerContents.module.css";
@@ -36,7 +31,6 @@ const newPostInitialValues = {
 };
 
 const HeaderContents = () => {
-  const { Title, Text } = Typography;
   const { TextArea } = Input;
 
   const router = useRouter();
@@ -51,8 +45,6 @@ const HeaderContents = () => {
 
   const {
     userDetails,
-    setUserDetails,
-    setAllUsers,
     setAllPosts,
     setSinglePostDetails,
     setIsModalOpen,
@@ -76,6 +68,10 @@ const HeaderContents = () => {
   const handleRedirectToUserLogin = () => {
     sessionStorage.removeItem("token");
     router.push("/signin");
+  };
+
+  const redirectToHomePage = () => {
+    router.push(`/${userDetails.id}`);
   };
 
   const handleOpenModal = () => {
@@ -196,18 +192,6 @@ const HeaderContents = () => {
   }, [searchValue]);
 
   useEffect(() => {
-    (async () => {
-      const allUsers = await fetchAllUsers();
-      console.log("alluser", allUsers);
-
-      const userDetails = allUsers.find(
-        (userObj: IUserDetails) => userObj._id === id
-      );
-      setUserDetails(userDetails);
-    })();
-  }, []);
-
-  useEffect(() => {
     if (Object.keys(singlePostDetails).length > 0) {
       const postDetails = allPosts.find(
         (post: IAllPosts) => post._id === singlePostDetails._id
@@ -225,7 +209,9 @@ const HeaderContents = () => {
       <div className={styles.mainHeader}>
         <div className={styles.subHeaderContents}>
           <div className={styles.searchContainer}>
-            <div className={styles.logo}>PUBLISH</div>
+            <div className={styles.logo} onClick={redirectToHomePage}>
+              PUBLISH
+            </div>
             <div>
               <Input
                 placeholder="Search...."
@@ -269,11 +255,8 @@ const HeaderContents = () => {
           >
             {searchedPostResults.map((item) => (
               <>
-                <Text type="secondary">@{item.fullName}</Text>
-                <Title level={3} className={styles.postTitle}>
-                  {item.title}
-                </Title>
-                <Text type="secondary"></Text>
+                <div className={styles.fullName}>@{item.fullName}</div>
+                <div className={styles.postTitle}>{item.title}</div>
               </>
             ))}
           </Card>
@@ -304,12 +287,14 @@ const HeaderContents = () => {
             <div></div>
           </div>
 
-          <RichTextEditor
-            setNewPost={setNewPost}
-            newPost={newPost}
-            setValue={setValue}
-            value={value}
-          />
+          <div className={styles.createPostEditor}>
+            <RichTextEditor
+              setNewPost={setNewPost as any}
+              newPost={newPost}
+              setValue={setValue}
+              value={value}
+            />
+          </div>
         </Card>
       </ModalWindow>
     </>
