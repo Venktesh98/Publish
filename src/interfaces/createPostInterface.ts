@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { ICommentsPayload } from "./commentsInterface";
 
 export interface IModalWindowProps {
   title: string;
@@ -18,8 +19,9 @@ export interface INewPostPayload {
 }
 
 export interface IEditorProps {
-  newPost: INewPostPayload;
-  setNewPost: (description: INewPostPayload) => void;
+  newPost: INewPostPayload | ICommentsPayload;
+  setNewPost: (description: INewPostPayload | ICommentsPayload) => void;
   setValue: (content: string) => void;
   value: string;
 }
+

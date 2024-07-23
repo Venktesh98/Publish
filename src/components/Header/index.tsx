@@ -27,39 +27,39 @@ const BlogRootComp = () => {
     }
   };
 
-  const handleScroll = () => {
-    if (
-      window.innerHeight + document.documentElement.scrollTop !==
-        document.documentElement.offsetHeight ||
-      isLoading
-    ) {
-      return;
-    }
+  // const handleScroll = () => {
+  //   if (
+  //     window.innerHeight + document.documentElement.scrollTop !==
+  //       document.documentElement.offsetHeight ||
+  //     isLoading
+  //   ) {
+  //     return;
+  //   }
 
-    if (isLastPage) {
-      return;
-    }
-    setIsScrolled(true);
-    fetchPosts().then(() => {
-      window.scrollBy(0, 2);
-      setIsScrolled(false);
-    });
-  };
+  //   if (isLastPage) {
+  //     return;
+  //   }
+  //   setIsScrolled(true);
+  //   fetchPosts().then(() => {
+  //     window.scrollBy(0, 2);
+  //     setIsScrolled(false);
+  //   });
+  // };
 
   useEffect(() => {
     fetchPosts();
   }, []);
 
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [isLoading]);
+  // useEffect(() => {
+  //   window.addEventListener("scroll", handleScroll);
+  //   return () => window.removeEventListener("scroll", handleScroll);
+  // }, [isLoading]);
 
-  useEffect(() => {
-    if (isScrolled) {
-      setPageNumber(pageNumber + 1);
-    }
-  }, [isScrolled]);
+  // useEffect(() => {
+  //   if (isScrolled) {
+  //     setPageNumber(pageNumber + 1);
+  //   }
+  // }, [isScrolled]);
 
   return (
     <div>

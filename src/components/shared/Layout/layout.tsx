@@ -1,15 +1,12 @@
 "use client";
 import BlogRootComp from "@/components/Header";
-import HeaderContents from "@/components/Header/Contents";
-import MainHeader from "@/components/Header/mainHeader";
+import HeaderLayout from "../HeaderLayout";
 import styles from "./layout.module.css";
 
 export default function Layout() {
   return (
     <div>
-      <MainHeader>
-        <HeaderContents />
-      </MainHeader>
+      <HeaderLayout />
       <main className={styles.main}>
         <BlogRootComp />
       </main>

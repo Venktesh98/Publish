@@ -14,5 +14,3 @@ export const serializeDate = (date: string) => {
   );
   return { formattedDate, formattedDateWithYear };
 };
-
-

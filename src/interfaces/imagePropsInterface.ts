@@ -4,6 +4,6 @@ export interface IImageProps {
   alt: string;
   width: number;
   height: number;
-  photo: string;
+  photo?: string;
   isCircle?: boolean;
 }

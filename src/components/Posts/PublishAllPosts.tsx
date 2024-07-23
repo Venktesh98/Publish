@@ -1,5 +1,6 @@
 "use client";
 import { BlogCtx } from "@/context/blogContext";
+import { IAllComments } from "@/interfaces/commentsInterface";
 import {
   IAllPosts,
   IAllPostsProps,
@@ -19,18 +20,19 @@ import {
   Button,
   Card,
   Empty,
-  Menu,
   Popover,
   Skeleton,
   Space,
   Typography,
   message,
 } from "antd";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useContext, useState } from "react";
 import ImageControl from "../shared/ImageControl";
 import PopOverControl from "../shared/PopOverControl";
+import Comments from "./Comments";
 import styles from "./posts.module.css";
+import ConfirmBox from "../shared/ConfirmationDialog";
 
 const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
   const { Title, Text } = Typography;
@@ -46,6 +48,10 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
   } = useContext(BlogCtx);
 
   const { id } = useParams();
+  const router = useRouter();
+
+  const [isCommentModalOpen, setIsCommentModalOpen] = useState<boolean>(false);
+  const [postId, setPostId] = useState<string>("");
 
   const handleFollowAUser = async (userIdOfUserToFollow: string) => {
     try {
@@ -71,11 +77,60 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
     }
   };
 
-  const showComments = (comments: string[]) => {
+  const showComments = (comments: IAllComments[]) => {
     if (comments.length > 1) {
       return `${comments.length} comments`;
     }
     return `${comments.length} comment`;
+  };
+
+  const allComments = (postDetails: IAllPosts) => {
+    return postDetails.comments.length <= 2 ? (
+      <div className={styles.userCommentsContainer}>
+        {postDetails.comments.map((comment) => (
+          <div className={styles.userComments} key={comment._id}>
+            <div>
+              <ImageControl
+                src={postDetails.user.profilePhoto}
+                width={30}
+                height={30}
+                alt="No Image"
+                photo={postDetails.user.profilePhoto}
+                isCircle={true}
+              />
+            </div>
+            <div className={styles.comments}>{comment.description}</div>
+          </div>
+        ))}
+      </div>
+    ) : (
+      <div>
+        <div className={styles.userCommentsContainer}>
+          {postDetails.comments.slice(0, 2).map((commentObj) => (
+            <div className={styles.userComments} key={postDetails._id}>
+              <div>
+                <ImageControl
+                  src={postDetails.user.profilePhoto}
+                  width={30}
+                  height={30}
+                  alt="No Image"
+                  photo={postDetails.user.profilePhoto}
+                  isCircle={true}
+                />
+              </div>
+              <div className={styles.comments}>{commentObj.description}</div>
+            </div>
+          ))}
+        </div>
+
+        <div
+          className={styles.seeAllComments}
+          onClick={() => handleRedirectToDetailsPage(postDetails._id, true)}
+        >
+          See all {postDetails.comments.length} comments
+        </div>
+      </div>
+    );
   };
 
   const formatJoinedDate = (userDetails: IUserDetails) => {
@@ -137,11 +192,34 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
     setIsEditMode(true);
   };
 
+  const handleOpenCommentWindow = (postId: string) => {
+    setIsCommentModalOpen(true);
+    setPostId(postId);
+  };
+
+  const handleRedirectToDetailsPage = (
+    postId: string,
+    isShowComments: boolean
+  ) => {
+    return isShowComments
+      ? router.push(`/post/${postId}?comments=show`)
+      : router.push(`/post/${postId}`);
+  };
+
   const menuItemContent = (postItem: IAllPosts) => {
     return (
       <div className={styles.menuItemContents}>
         <p onClick={() => handleEdit(postItem)}>Edit</p>
-        <p onClick={() => handleDeletePost(postItem._id)}>Delete</p>
+        <p>
+          <ConfirmBox
+            title="Delete Comment"
+            description="Are you sure you want to delete the comment?"
+            handleConfirm={() => handleDeletePost(postItem._id)}
+            handleConfirmCancel={() => {}}
+          >
+            Delete
+          </ConfirmBox>
+        </p>
       </div>
     );
   };
@@ -157,16 +235,14 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
           ))}
         </Space>
       ) : !allPosts ? (
-        <>
-          <Empty
-            image="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg"
-            imageStyle={{ height: 60 }}
-          >
-            <Button type="primary" onClick={() => setIsModalOpen(true)}>
-              Create Now
-            </Button>
-          </Empty>
-        </>
+        <Empty
+          image="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg"
+          imageStyle={{ height: 60 }}
+        >
+          <Button type="primary" onClick={() => setIsModalOpen(true)}>
+            Create Now
+          </Button>
+        </Empty>
       ) : (
         allPosts.map((postItem: IAllPosts) => (
           <div key={postItem.id}>
@@ -181,13 +257,13 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
               />
               <div className={styles.userSectionMain}>
                 <div className={styles.userImageContainer}>
-                  {postItem?.user?.profilePhoto ? (
+                  {(postItem?.user as IUserDetails)?.profilePhoto ? (
                     <ImageControl
-                      src={postItem.user.profilePhoto ?? "/"}
+                      src={(postItem.user as IUserDetails).profilePhoto ?? "/"}
                       alt=""
                       width={40}
                       height={40}
-                      photo={postItem.user.profilePhoto}
+                      photo={(postItem.user as IUserDetails).profilePhoto}
                       isCircle={true}
                     />
                   ) : (
@@ -199,10 +275,10 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
                   <div className={styles.userDetailsContainer}>
                     <Text strong className={styles.userStyle}>
                       <PopOverControl
-                        title={postItem?.user?.fullName}
-                        content={popOverContent(postItem?.user)}
+                        title={(postItem?.user as IUserDetails)?.fullName}
+                        content={popOverContent(postItem?.user as IUserDetails)}
                       >
-                        {postItem?.user?.fullName}
+                        {(postItem?.user as IUserDetails)?.fullName}
                       </PopOverControl>
                     </Text>
                     <Text type="secondary" className={styles.userStyle}>{`${
@@ -211,7 +287,7 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
                   </div>
                 </div>
 
-                {userDetails?._id === postItem.user._id && (
+                {userDetails?._id === (postItem.user as IUserDetails)._id && (
                   <div className={styles.menuItem}>
                     <Popover
                       placement="bottom"
@@ -225,24 +301,48 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
               </div>
 
               <div className={styles.postInfoContainer}>
-                <Title level={3}>{postItem.title}</Title>
+                <Title
+                  level={3}
+                  className={styles.title}
+                  onClick={() =>
+                    handleRedirectToDetailsPage(postItem._id, false)
+                  }
+                >
+                  {postItem.title}
+                </Title>
 
                 <div className={styles.commentsContainer}>
                   {postItem?.comments?.length ? (
-                    <Button type="text">
+                    <Button
+                      type="text"
+                      onClick={() =>
+                        handleRedirectToDetailsPage(postItem._id, true)
+                      }
+                    >
                       <CommentOutlined /> {showComments(postItem?.comments)}
                     </Button>
                   ) : (
-                    <Button type="text">
+                    <Button
+                      type="text"
+                      onClick={() => handleOpenCommentWindow(postItem._id)}
+                    >
                       <CommentOutlined /> Add Comment
                     </Button>
                   )}
                 </div>
+
+                {allComments(postItem)}
               </div>
             </Card>
           </div>
         ))
       )}
+
+      <Comments
+        setIsCommentModalOpen={setIsCommentModalOpen}
+        isCommentModalOpen={isCommentModalOpen}
+        postId={postId}
+      />
     </div>
   );
 };
