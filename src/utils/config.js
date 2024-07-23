@@ -1,9 +1,8 @@
 import axios from "axios";
 
-export const API_URL = "http://localhost:8000/api/v1";
 
 export const blogServiceAPI = axios.create({
-  baseURL: `${API_URL}`,
+  baseURL: `${process.env.NEXT_PUBLIC_blog_service_url}`,
 });
 
 blogServiceAPI.interceptors.request.use(
@@ -20,7 +19,7 @@ blogServiceAPI.interceptors.request.use(
 );
 
 export const blogServiceUserRegisterAPI = axios.create({
-  baseURL: `${API_URL}`,
+  baseURL: `${process.env.NEXT_PUBLIC_blog_service_url}`,
   headers: {
     "Content-Type": "multipart/form-data",
   },
