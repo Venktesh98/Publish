@@ -49,6 +49,18 @@ export const editAPost = async (id: string, payload: INewPostPayload) => {
   return data;
 };
 
+export const likePost = async (postId: string) => {
+  const { data } = await blogServiceAPI.get(`/posts/like/${postId}`);
+
+  return data;
+};
+
+export const unLikePost = async (postId: string) => {
+  const { data } = await blogServiceAPI.get(`/posts/dislike/${postId}`);
+
+  return data;
+};
+
 // USERS
 export const followAUser = async (userId: string) => {
   const { data } = await blogServiceAPI.get(`/users/following/${userId}`);

@@ -13,6 +13,7 @@ import {
 } from "@/services/services";
 import {
   EditTwoTone,
+  FrownOutlined,
   LoginOutlined,
   LogoutOutlined,
   UpOutlined,
@@ -247,17 +248,38 @@ const HeaderContents = () => {
       </div>
 
       <div className={styles.searchResultsCard}>
-        {searchValue.length > 0 && searchedPostResults.length > 0 && (
+        {searchValue.length > 0 && searchedPostResults.length > 0 ? (
           <Card
             bordered={true}
-            style={{ minHeight: 350, width: 500, overflowY: "auto" }}
+            style={{
+              minHeight: 350,
+              width: 500,
+              overflowY: "auto",
+            }}
           >
             {searchedPostResults.map((item) => (
               <>
-                <div className={styles.fullName}>@{item.fullName}</div>
-                <div className={styles.postTitle}>{item.title}</div>
+                <div className={styles.fullName}>@{item?.fullName}</div>
+                <div
+                  className={styles.postTitle}
+                  onClick={() => router.push(`/post/${item.id}`)}
+                >
+                  {item.title}
+                </div>
               </>
             ))}
+          </Card>
+        ) : null}
+
+        {searchValue.length > 0 && !searchedPostResults.length && (
+          <Card bordered={true} style={{ width: 500 }}>
+            <div className={styles.noPostsAvailable}>
+              <div>
+                <FrownOutlined style={{ fontSize: "32px" }} />
+              </div>
+
+              <div>No Posts Available</div>
+            </div>
           </Card>
         )}
       </div>
