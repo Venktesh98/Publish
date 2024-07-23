@@ -1,7 +1,10 @@
 "use client";
+import { useEffect } from "react";
 
-const page = () => {
-  window.location.href = "/signin";
+const MainPage = () => {
+  useEffect(() => {
+    window.location.href = "/signin";
+  }, []);
 };
 
-export default page;
+export default MainPage;

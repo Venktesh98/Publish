@@ -18,7 +18,7 @@ import {
   UpOutlined,
 } from "@ant-design/icons";
 import { Avatar, Button, Card, Input, message } from "antd";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import styles from "./headerContents.module.css";
 
@@ -34,7 +34,6 @@ const HeaderContents = () => {
   const { TextArea } = Input;
 
   const router = useRouter();
-  const { id } = useParams();
 
   const [searchValue, setSearchValue] = useState<string>("");
   const [searchedPostResults, setSearchedPostResults] = useState<
@@ -160,7 +159,7 @@ const HeaderContents = () => {
 
     if (token) {
       return (
-        <div onClick={handleRedirectToUserLogin}>
+        <div onClick={handleRedirectToUserLogin} className={styles.logout}>
           <LogoutOutlined /> Logout
         </div>
       );
