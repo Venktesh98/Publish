@@ -28,6 +28,8 @@ export const blogServiceUserCreateNewPostAPI = axios.create({
   baseURL: `${process.env.NEXT_PUBLIC_blog_service_url}`,
   headers: {
     "Content-Type": "multipart/form-data",
-    Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+    Authorization: `Bearer ${
+      typeof window !== "undefined" && sessionStorage.getItem("token")
+    }`,
   },
 });

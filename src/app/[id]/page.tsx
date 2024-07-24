@@ -5,7 +5,9 @@ import { useParams } from "next/navigation";
 const Home = () => {
   const { id } = useParams();
 
-  sessionStorage.setItem("userId", id as string);
+  if (typeof window !== "undefined") {
+    sessionStorage.setItem("userId", id as string);
+  }
   return <Layout />;
 };
 

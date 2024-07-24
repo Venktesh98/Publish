@@ -15,7 +15,9 @@ const PublishSignIn = () => {
     try {
       const data = await loginUser(values);
       message.success("LoggedIn Successfully");
-      sessionStorage.setItem("token", data.token);
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("token", data.token);
+      }
       router.push(`/${data.userId}`);
     } catch (error: any) {
       message.error(error?.response?.data?.message ?? error.msg);
