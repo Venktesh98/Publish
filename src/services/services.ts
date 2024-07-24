@@ -6,11 +6,18 @@ import {
   ISubmitSignupFormValues,
 } from "@/interfaces/formInterface";
 import { ISearchPayload } from "@/interfaces/postsInterface";
-import { blogServiceAPI, blogServiceUserRegisterAPI } from "@/utils/config";
+import {
+  blogServiceAPI,
+  blogServiceUserCreateNewPostAPI,
+  blogServiceUserRegisterAPI,
+} from "@/utils/config";
 
 // POSTS
 export const createNewPost = async (payload: INewPostPayload) => {
-  const { data } = await blogServiceAPI.post("/posts", payload);
+  const { data } = await blogServiceUserCreateNewPostAPI.post(
+    "/posts",
+    payload
+  );
 
   return data;
 };
@@ -80,10 +87,22 @@ export const fetchAllUsers = async () => {
   return data.data;
 };
 
-export const imageUpload = async (payload: IFileDetails) => {
+export const imageUpload = async (
+  route: string,
+  payload: IFileDetails,
+  onUploadProgress: (progress: number) => void
+) => {
   const { data } = await blogServiceUserRegisterAPI.post(
-    "/users/upload",
-    payload
+    `/${route}/upload`,
+    payload,
+    {
+      onUploadProgress: (progressEvent: any) => {
+        const percentCompleted = Math.round(
+          (progressEvent.loaded * 100) / progressEvent?.total
+        );
+        onUploadProgress(percentCompleted);
+      },
+    }
   );
   return data;
 };

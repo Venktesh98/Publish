@@ -1,4 +1,5 @@
 "use client";
+import ConfirmBox from "@/components/shared/ConfirmationDialog";
 import DrawerWindow from "@/components/shared/Drawer";
 import HeaderLayout from "@/components/shared/HeaderLayout";
 import ImageControl from "@/components/shared/ImageControl";
@@ -24,7 +25,6 @@ import { useParams, useSearchParams } from "next/navigation";
 import { useContext, useEffect, useMemo, useState } from "react";
 import RichTextEditor from "../Editor";
 import styles from "./postDetails.module.css";
-import ConfirmBox from "@/components/shared/ConfirmationDialog";
 
 const PostDetails = () => {
   const { postId } = useParams();
@@ -188,38 +188,42 @@ const PostDetails = () => {
               </div>
             </div>
 
-            <div className={styles.userActions}>
-              <div>
-                {userDetails?.following?.includes(postDetails?.user) ? (
-                  <Button
-                    type="primary"
-                    size="small"
-                    onClick={() =>
-                      handleUnFollowAUser(
-                        postDetails?.user as unknown as string
-                      )
-                    }
-                  >
-                    {UserEnumValues.UNFOLLOW}
-                  </Button>
-                ) : (
-                  <Button
-                    type="primary"
-                    size="small"
-                    onClick={() =>
-                      handleFollowAUser(postDetails?.user as unknown as string)
-                    }
-                  >
-                    {UserEnumValues.FOLLOW}
-                  </Button>
-                )}
+            {postUserDetails?._id !== userDetails?._id && (
+              <div className={styles.userActions}>
+                <div>
+                  {userDetails?.following?.includes(postDetails?.user) ? (
+                    <Button
+                      type="primary"
+                      size="small"
+                      onClick={() =>
+                        handleUnFollowAUser(
+                          postDetails?.user as unknown as string
+                        )
+                      }
+                    >
+                      {UserEnumValues.UNFOLLOW}
+                    </Button>
+                  ) : (
+                    <Button
+                      type="primary"
+                      size="small"
+                      onClick={() =>
+                        handleFollowAUser(
+                          postDetails?.user as unknown as string
+                        )
+                      }
+                    >
+                      {UserEnumValues.FOLLOW}
+                    </Button>
+                  )}
+                </div>
+                <div onClick={() => setOpenDrawer(true)}>
+                  <CommentOutlined
+                    style={{ fontSize: "19px", cursor: "pointer" }}
+                  />
+                </div>
               </div>
-              <div onClick={() => setOpenDrawer(true)}>
-                <CommentOutlined
-                  style={{ fontSize: "19px", cursor: "pointer" }}
-                />
-              </div>
-            </div>
+            )}
           </div>
 
           <div>

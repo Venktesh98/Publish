@@ -73,6 +73,10 @@
 
 .coverImage {
   margin-bottom: 10px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
 }
 
 .postTitle {
@@ -83,7 +87,7 @@
   box-shadow: none !important;
 }
 
-.postTitle:hover {
+.searchedPostTitle:hover {
   color: rgb(109, 64, 109);
   cursor: pointer;
 }
@@ -110,5 +114,13 @@
   font-weight: 800;
   text-align: center;
   color: gray;
-  /* transform: translateY(85px); */
+}
+
+.formSubmit {
+  float: right;
+  margin-top: 10px;
+}
+
+.formItem {
+  margin-bottom: 5px;
 }

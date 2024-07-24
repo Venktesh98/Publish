@@ -12,7 +12,8 @@ const BlogProvider = ({ children }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [singlePostDetails, setSinglePostDetails] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
-  const [isGlobalLoading, setIsGlobalLoading] = useState(false)
+  const [isGlobalLoading, setIsGlobalLoading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   return (
     <BlogCtx.Provider
@@ -32,7 +33,9 @@ const BlogProvider = ({ children }) => {
         setIsEditMode,
         isEditMode,
         setIsGlobalLoading,
-        isGlobalLoading
+        isGlobalLoading,
+        setUploadProgress,
+        uploadProgress
       }}
     >
       {children}

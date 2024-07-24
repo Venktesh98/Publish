@@ -39,3 +39,9 @@
   background-color: rgb(234 234 234);
   border: none;
 }
+
+.uploadProfileImageContainer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}

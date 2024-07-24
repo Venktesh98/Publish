@@ -3,6 +3,7 @@ import RichTextEditor from "@/components/Posts/Editor";
 import ModalWindow from "@/components/shared/Modal";
 import PopOverControl from "@/components/shared/PopOverControl";
 import { BlogCtx } from "@/context/blogContext";
+import { useImageUpload } from "@/hooks/useImageUpload";
 import { INewPostPayload } from "@/interfaces/createPostInterface";
 import { IAllPosts, ISearchedPostResults } from "@/interfaces/postsInterface";
 import {
@@ -18,9 +19,19 @@ import {
   LogoutOutlined,
   UpOutlined,
 } from "@ant-design/icons";
-import { Avatar, Button, Card, Input, message } from "antd";
+import {
+  Avatar,
+  Button,
+  Card,
+  Form,
+  FormInstance,
+  Input,
+  Progress,
+  Upload,
+  message,
+} from "antd";
 import { useRouter } from "next/navigation";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import styles from "./headerContents.module.css";
 
 const newPostInitialValues = {
@@ -28,7 +39,15 @@ const newPostInitialValues = {
   description: "",
   descriptionHtmlText: "",
   category: "",
-  image: "",
+  photo: "",
+};
+
+type FieldType = {
+  title: string;
+  description: string;
+  userName: string;
+  category: string;
+  photo: string;
 };
 
 const HeaderContents = () => {
@@ -42,6 +61,12 @@ const HeaderContents = () => {
   >([]);
   const [newPost, setNewPost] = useState<INewPostPayload>(newPostInitialValues);
   const [value, setValue] = useState<string>(" ");
+  const formRef = useRef<FormInstance>(null);
+
+  const { fileList, handleImageUpload } = useImageUpload(
+    "cover-image",
+    "posts"
+  );
 
   const {
     userDetails,
@@ -54,6 +79,8 @@ const HeaderContents = () => {
     isEditMode,
     setIsEditMode,
     setPageNumber,
+    uploadProgress,
+    setUploadProgress,
   } = useContext(BlogCtx);
 
   const handleOnSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -83,21 +110,27 @@ const HeaderContents = () => {
     setNewPost({ ...newPostInitialValues });
     setValue("");
     setSinglePostDetails("");
+    setUploadProgress(0);
     if (isEditMode) {
       setIsEditMode(false);
     }
   };
 
   const handlePublishNewPost = async () => {
-    const payload = {
-      title: newPost.title,
-      description: newPost.description,
-      descriptionHtmlText: value,
-    };
+    const formData = new FormData();
+
+    formData.append("title", newPost.title);
+    formData.append("description", newPost.description);
+    formData.append("descriptionHtmlText", value);
+    if (fileList[0] !== undefined) {
+      formData.append("cover-image", fileList[0]?.originFileObj);
+    }
 
     try {
-      if (payload.title.length > 0 && payload.description.length > 0) {
-        const data = await createNewPost(payload);
+      if (newPost.title.length > 0 && newPost.description.length > 0) {
+        const data = await createNewPost(
+          formData as unknown as INewPostPayload
+        );
         if (data.status === 200) {
           try {
             const fetchedPosts = await getAllPosts(0);
@@ -114,6 +147,7 @@ const HeaderContents = () => {
     } finally {
       setNewPost({ ...newPostInitialValues });
       setValue("");
+      formRef.current?.resetFields();
     }
   };
 
@@ -136,13 +170,27 @@ const HeaderContents = () => {
 
   const footerButtons = () => {
     return isEditMode ? (
-      <Button key="submit" type="primary" onClick={handleEditPost}>
-        Update
-      </Button>
+      <Form.Item className={styles.formItem}>
+        <Button
+          // key="submit"
+          type="primary"
+          /* onClick={handleEditPost} */ htmlType="submit"
+          className={styles.formSubmit}
+        >
+          Update
+        </Button>
+      </Form.Item>
     ) : (
-      <Button key="submit" type="primary" onClick={handlePublishNewPost}>
-        Publish
-      </Button>
+      <Form.Item className={styles.formItem}>
+        <Button
+          // key="submit"
+          type="primary"
+          /* onClick={handlePublishNewPost} */ htmlType="submit"
+          className={styles.formSubmit}
+        >
+          Publish
+        </Button>
+      </Form.Item>
     );
   };
 
@@ -261,7 +309,7 @@ const HeaderContents = () => {
               <>
                 <div className={styles.fullName}>@{item?.fullName}</div>
                 <div
-                  className={styles.postTitle}
+                  className={styles.searchedPostTitle}
                   onClick={() => router.push(`/post/${item.id}`)}
                 >
                   {item.title}
@@ -288,35 +336,79 @@ const HeaderContents = () => {
         title={"Create Post"}
         isModalOpen={isModalOpen}
         handleCancel={handleCancel}
-        footerButtons={footerButtons}
+        footerButtons={undefined}
         width={1000}
       >
-        <Card bordered={true}>
-          <div className={styles.postTitleContainer}>
-            <TextArea
-              className={styles.postTitle}
-              onChange={handlePostTitleChange}
-              placeholder="New Post Title...."
-              autoSize
-              value={newPost.title}
-              autoFocus
-            />
-          </div>
+        <Form
+          name="create-post"
+          onFinish={isEditMode ? handleEditPost : handlePublishNewPost}
+          ref={formRef}
+          initialValues={newPostInitialValues}
+        >
+          <Card bordered={true}>
+            <Form.Item<FieldType>
+              className={styles.formItem}
+              name="title"
+              rules={[{ required: true, message: "Enter Title" }]}
+            >
+              <div className={styles.postTitleContainer}>
+                <TextArea
+                  className={styles.postTitle}
+                  onChange={handlePostTitleChange}
+                  placeholder="New Post Title...."
+                  autoSize
+                  value={newPost.title}
+                  autoFocus
+                />
+              </div>
+            </Form.Item>
 
-          <div className={styles.coverImage}>
-            <Button size="large">Add Cover Image</Button>
-            <div></div>
-          </div>
+            <Form.Item<FieldType> className={styles.formItem} name="photo">
+              <div className={styles.coverImage}>
+                <div>
+                  <Upload
+                    listType="picture"
+                    onChange={handleImageUpload}
+                    fileList={fileList}
+                    accept={".png,.jpeg,.jpg,.webp"}
+                    beforeUpload={() => false}
+                    maxCount={1}
+                    // onRemove={uploadProgress > 0 && setUploadProgress(0)}
+                  >
+                    <Button size="large">Add Cover Image</Button>
+                  </Upload>
+                </div>
 
-          <div className={styles.createPostEditor}>
-            <RichTextEditor
-              setNewPost={setNewPost as any}
-              newPost={newPost}
-              setValue={setValue}
-              value={value}
-            />
-          </div>
-        </Card>
+                <div>
+                  {uploadProgress > 0 && (
+                    <Progress
+                      type="dashboard"
+                      size={70}
+                      percent={uploadProgress}
+                      gapDegree={uploadProgress}
+                      trailColor="rgba(0, 0, 0, 0.06)"
+                      strokeWidth={20}
+                      steps={8}
+                    />
+                  )}
+                </div>
+              </div>
+            </Form.Item>
+
+            <Form.Item<FieldType> className={styles.formItem}>
+              <div className={styles.createPostEditor}>
+                <RichTextEditor
+                  setNewPost={setNewPost as any}
+                  newPost={newPost}
+                  setValue={setValue}
+                  value={value}
+                />
+              </div>
+            </Form.Item>
+          </Card>
+
+          {footerButtons()}
+        </Form>
       </ModalWindow>
     </>
   );
