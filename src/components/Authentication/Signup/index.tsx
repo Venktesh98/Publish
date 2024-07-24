@@ -1,10 +1,9 @@
 "use client";
 import JoinCommunityText from "@/components/shared/JoinCommunityText";
-import {
-  IFileDetails,
-  ISubmitSignupFormValues,
-} from "@/interfaces/formInterface";
-import { imageUpload, registerUser } from "@/services/services";
+import { BlogCtx } from "@/context/blogContext";
+import { useImageUpload } from "@/hooks/useImageUpload";
+import { ISubmitSignupFormValues } from "@/interfaces/formInterface";
+import { registerUser } from "@/services/services";
 import {
   LockOutlined,
   MailOutlined,
@@ -12,12 +11,20 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import type { FormInstance } from "antd";
-import { Button, Card, Flex, Form, Input, Upload, message } from "antd";
-import { UploadChangeParam } from "antd/es/upload";
+import {
+  Button,
+  Card,
+  Flex,
+  Form,
+  Input,
+  Progress,
+  Upload,
+  message,
+} from "antd";
 import Link from "next/link";
-import { useRef, useState } from "react";
-import styles from "./signup.module.css";
 import { useRouter } from "next/navigation";
+import { useContext, useRef, useState } from "react";
+import styles from "./signup.module.css";
 
 type FieldType = {
   firstName: string;
@@ -36,11 +43,16 @@ const initialValues = {
 };
 
 const PublishSignup = () => {
-  const [fileList, setFileList] = useState<any>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const formRef = useRef<FormInstance>(null);
 
+  const { fileList, handleImageUpload } = useImageUpload(
+    "profile-pic",
+    "users"
+  );
+
   const router = useRouter();
+  const { uploadProgress } = useContext(BlogCtx);
 
   const handleFormSubmit = async (values: ISubmitSignupFormValues) => {
     const formData = new FormData();
@@ -65,30 +77,6 @@ const PublishSignup = () => {
     } catch (error: any) {
       message.error(error.response.data.message ?? "Something went wrong");
       setIsLoading(false);
-    }
-  };
-
-  const handleImageUpload = async (info: UploadChangeParam) => {
-    let newFileList = [...info.fileList];
-    setFileList(newFileList);
-
-    if (info.file.status === "removed") {
-      return;
-    }
-
-    if (info.file.status !== "uploading") {
-      const formData = new FormData();
-      newFileList.forEach((file: any) => {
-        formData.append("profile-pic", file.originFileObj);
-      });
-
-      try {
-        const response = await imageUpload(formData as unknown as IFileDetails);
-        message.success(response.message);
-        console.log(response.data);
-      } catch (error) {
-        message.error("Upload failed");
-      }
     }
   };
 
@@ -156,15 +144,33 @@ const PublishSignup = () => {
             </Form.Item>
 
             <Form.Item>
-              <Upload
-                listType="picture"
-                onChange={handleImageUpload}
-                fileList={fileList}
-                accept={".png,.jpeg,.jpg,.webp"}
-                beforeUpload={() => false}
-              >
-                <Button icon={<UploadOutlined />}>Upload</Button>
-              </Upload>
+              <div className={styles.uploadProfileImageContainer}>
+                <div>
+                  <Upload
+                    listType="picture"
+                    onChange={handleImageUpload}
+                    fileList={fileList}
+                    accept={".png,.jpeg,.jpg,.webp"}
+                    beforeUpload={() => false}
+                  >
+                    <Button icon={<UploadOutlined />}>Upload</Button>
+                  </Upload>
+                </div>
+
+                <div>
+                  {uploadProgress > 0 && (
+                    <Progress
+                      type="dashboard"
+                      size={70}
+                      percent={uploadProgress}
+                      gapDegree={uploadProgress}
+                      trailColor="rgba(0, 0, 0, 0.06)"
+                      strokeWidth={20}
+                      steps={8}
+                    />
+                  )}
+                </div>
+              </div>
             </Form.Item>
 
             <Form.Item className={styles.submitBtn}>

@@ -1,6 +1,5 @@
 import axios from "axios";
 
-
 export const blogServiceAPI = axios.create({
   baseURL: `${process.env.NEXT_PUBLIC_blog_service_url}`,
 });
@@ -22,5 +21,13 @@ export const blogServiceUserRegisterAPI = axios.create({
   baseURL: `${process.env.NEXT_PUBLIC_blog_service_url}`,
   headers: {
     "Content-Type": "multipart/form-data",
+  },
+});
+
+export const blogServiceUserCreateNewPostAPI = axios.create({
+  baseURL: `${process.env.NEXT_PUBLIC_blog_service_url}`,
+  headers: {
+    "Content-Type": "multipart/form-data",
+    Authorization: `Bearer ${sessionStorage.getItem("token")}`,
   },
 });

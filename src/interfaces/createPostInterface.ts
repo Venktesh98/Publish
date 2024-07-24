@@ -5,7 +5,7 @@ export interface IModalWindowProps {
   title: string;
   isModalOpen: boolean;
   handleCancel: () => void;
-  footerButtons: () => ReactNode;
+  footerButtons?: () => ReactNode | undefined;
   width?: number;
   children: ReactNode;
 }
@@ -15,7 +15,7 @@ export interface INewPostPayload {
   description: string;
   descriptionHtmlText: string;
   category?: string;
-  image?: string;
+  photo?: string;
 }
 
 export interface IEditorProps {

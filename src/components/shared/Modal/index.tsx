@@ -16,7 +16,7 @@ const ModalWindow = ({
         title={title}
         open={isModalOpen}
         onCancel={handleCancel}
-        footer={[footerButtons()]}
+        footer={footerButtons !== undefined && [footerButtons()]}
         width={width}
       >
         {children}
