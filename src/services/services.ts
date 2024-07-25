@@ -51,7 +51,7 @@ export const deleteAPost = async (id: string) => {
 };
 
 export const editAPost = async (id: string, payload: INewPostPayload) => {
-  const { data } = await blogServiceAPI.put(`/posts/${id}`, payload);
+  const { data } = await blogServiceUserCreateNewPostAPI.put(`/posts/${id}`, payload);
 
   return data;
 };

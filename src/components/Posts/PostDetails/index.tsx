@@ -282,17 +282,28 @@ const PostDetails = () => {
                     />
                   </div>
 
-                  <div className={styles.commentedUserName}>
-                    {commentObj?.user.fullName}
+                  <div className={styles.commentedUserDetails}>
+                    <div className={styles.commentedUserName}>
+                      {commentObj?.user.fullName}
+                      <span>
+                        {
+                          serializeDate(commentObj.createdAt)
+                            .formattedDateWithTime
+                        }
+                      </span>
+                    </div>
+
+                    <div>
+                      {commentObj.descriptionHtml?.length === 0 ||
+                      commentObj.descriptionHtml === undefined
+                        ? commentObj.description
+                        : parse(commentObj.descriptionHtml)}
+                    </div>
                   </div>
                 </div>
 
                 <div className={styles.comments}>
                   <div>
-                    {commentObj.descriptionHtml?.length === 0 ||
-                    commentObj.descriptionHtml === undefined
-                      ? commentObj.description
-                      : parse(commentObj.descriptionHtml)}
                     {commentObj?.user._id ===
                       sessionStorage.getItem("userId") && (
                       <>

@@ -60,6 +60,7 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
 
   const [isCommentModalOpen, setIsCommentModalOpen] = useState<boolean>(false);
   const [postId, setPostId] = useState<string>("");
+  const { allUsers } = useContext(BlogCtx);
 
   const handleFollowAUser = async (userIdOfUserToFollow: string) => {
     try {
@@ -92,6 +93,13 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
     return `${comments.length} comment`;
   };
 
+  const commentedUserDetails = (commentedUser: string) => {
+    const userDetails = allUsers.find(
+      (commentedUserObj: IUserDetails) => commentedUserObj._id === commentedUser
+    );
+    return userDetails.profilePhoto;
+  };
+
   const showLikesAndUnLikes = (postItem: IAllPosts) => {
     return (
       <Button type="text">
@@ -118,11 +126,13 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
           <div className={styles.userComments} key={comment._id}>
             <div>
               <ImageControl
-                src={postDetails.user.profilePhoto}
+                src={commentedUserDetails(comment.user as unknown as string)}
+                // src={postDetails.user.profilePhoto}
                 width={30}
                 height={30}
                 alt="No Image"
-                photo={postDetails.user.profilePhoto}
+                photo={commentedUserDetails(comment.user as unknown as string)}
+                // photo={postDetails.user.profilePhoto}
                 isCircle={true}
               />
             </div>

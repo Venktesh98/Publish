@@ -34,20 +34,49 @@ import { useRouter } from "next/navigation";
 import { useContext, useEffect, useRef, useState } from "react";
 import styles from "./headerContents.module.css";
 
-const newPostInitialValues = {
-  title: "",
-  description: "",
-  descriptionHtmlText: "",
-  category: "",
-  photo: "",
-};
-
 type FieldType = {
   title: string;
   description: string;
   userName: string;
   category: string;
   photo: string;
+};
+
+const useFormData = () => {
+  const newPostInitialValues = {
+    title: "",
+    description: "",
+    descriptionHtmlText: "",
+    category: "",
+    photo: "",
+  };
+
+  const [newPost, setNewPost] = useState<INewPostPayload>(newPostInitialValues);
+  const [value, setValue] = useState<string>(" ");
+  const { fileList, handleImageUpload } = useImageUpload(
+    "cover-image",
+    "posts"
+  );
+
+  const formData = new FormData();
+
+  formData.append("title", newPost.title);
+  formData.append("description", newPost.description);
+  formData.append("descriptionHtmlText", value);
+  if (fileList[0] !== undefined) {
+    formData.append("cover-image", fileList[0]?.originFileObj);
+  }
+
+  return {
+    newPost,
+    setNewPost,
+    value,
+    setValue,
+    fileList,
+    handleImageUpload,
+    formData,
+    newPostInitialValues,
+  };
 };
 
 const HeaderContents = () => {
@@ -59,14 +88,17 @@ const HeaderContents = () => {
   const [searchedPostResults, setSearchedPostResults] = useState<
     ISearchedPostResults[]
   >([]);
-  const [newPost, setNewPost] = useState<INewPostPayload>(newPostInitialValues);
-  const [value, setValue] = useState<string>(" ");
   const formRef = useRef<FormInstance>(null);
-
-  const { fileList, handleImageUpload } = useImageUpload(
-    "cover-image",
-    "posts"
-  );
+  const {
+    fileList,
+    formData,
+    handleImageUpload,
+    newPost,
+    setNewPost,
+    setValue,
+    value,
+    newPostInitialValues,
+  } = useFormData();
 
   const {
     userDetails,
@@ -117,15 +149,6 @@ const HeaderContents = () => {
   };
 
   const handlePublishNewPost = async () => {
-    const formData = new FormData();
-
-    formData.append("title", newPost.title);
-    formData.append("description", newPost.description);
-    formData.append("descriptionHtmlText", value);
-    if (fileList[0] !== undefined) {
-      formData.append("cover-image", fileList[0]?.originFileObj);
-    }
-
     try {
       if (newPost.title.length > 0 && newPost.description.length > 0) {
         const data = await createNewPost(
@@ -152,13 +175,10 @@ const HeaderContents = () => {
   };
 
   const handleEditPost = async () => {
-    const payload = {
-      title: newPost.title,
-      description: newPost.description,
-      descriptionHtmlText: value,
-    };
-
-    const data = await editAPost(singlePostDetails._id, payload);
+    const data = await editAPost(
+      singlePostDetails._id,
+      formData as unknown as INewPostPayload
+    );
     if (data.status === 200) {
       const fetchedPosts = await getAllPosts(0);
       setAllPosts([...fetchedPosts.data]);
@@ -171,23 +191,13 @@ const HeaderContents = () => {
   const footerButtons = () => {
     return isEditMode ? (
       <Form.Item className={styles.formItem}>
-        <Button
-          // key="submit"
-          type="primary"
-          /* onClick={handleEditPost} */ htmlType="submit"
-          className={styles.formSubmit}
-        >
+        <Button type="primary" htmlType="submit" className={styles.formSubmit}>
           Update
         </Button>
       </Form.Item>
     ) : (
       <Form.Item className={styles.formItem}>
-        <Button
-          // key="submit"
-          type="primary"
-          /* onClick={handlePublishNewPost} */ htmlType="submit"
-          className={styles.formSubmit}
-        >
+        <Button type="primary" htmlType="submit" className={styles.formSubmit}>
           Publish
         </Button>
       </Form.Item>
@@ -346,11 +356,7 @@ const HeaderContents = () => {
           initialValues={newPostInitialValues}
         >
           <Card bordered={true}>
-            <Form.Item<FieldType>
-              className={styles.formItem}
-              name="title"
-              rules={[{ required: true, message: "Enter Title" }]}
-            >
+            <Form.Item<FieldType> className={styles.formItem} name="title">
               <div className={styles.postTitleContainer}>
                 <TextArea
                   className={styles.postTitle}
@@ -373,7 +379,6 @@ const HeaderContents = () => {
                     accept={".png,.jpeg,.jpg,.webp"}
                     beforeUpload={() => false}
                     maxCount={1}
-                    // onRemove={uploadProgress > 0 && setUploadProgress(0)}
                   >
                     <Button size="large">Add Cover Image</Button>
                   </Upload>
