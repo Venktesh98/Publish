@@ -30,7 +30,7 @@ const PostDetails = () => {
   const { postId } = useParams();
   const searchParams = useSearchParams();
 
-  const { allUsers, userDetails, setUserDetails, setAllPosts } =
+  const { allUsers, userDetails, setUserDetails, allPosts, setAllPosts } =
     useContext(BlogCtx);
 
   const [postDetails, setPostDetails] = useState<IAllPosts | null>(null);
@@ -130,7 +130,7 @@ const PostDetails = () => {
     if (data.status === 200) {
       setPostDetails(data.data);
       const fetchedPosts = await getAllPosts(0);
-      setAllPosts(fetchedPosts.data);
+      setAllPosts([...fetchedPosts.data]);
     }
   };
 
@@ -309,7 +309,7 @@ const PostDetails = () => {
                       <>
                         <ConfirmBox
                           title="Delete Comment"
-                          description="Are you sure you want to delete the comment?"
+                          description="Are you sure you want to delete this comment?"
                           handleConfirm={() =>
                             handleDeleteComment(commentObj._id)
                           }

@@ -31,7 +31,7 @@ import {
   message,
 } from "antd";
 import { useRouter } from "next/navigation";
-import { useContext, useEffect, useRef, useState } from "react";
+import { use, useContext, useEffect, useRef, useState } from "react";
 import styles from "./headerContents.module.css";
 
 type FieldType = {
@@ -88,6 +88,7 @@ const HeaderContents = () => {
   const [searchedPostResults, setSearchedPostResults] = useState<
     ISearchedPostResults[]
   >([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const formRef = useRef<FormInstance>(null);
   const {
     fileList,
@@ -149,6 +150,16 @@ const HeaderContents = () => {
   };
 
   const handlePublishNewPost = async () => {
+    const formData = new FormData();
+    setIsLoading(true);
+
+    formData.append("title", newPost.title);
+    formData.append("description", newPost.description);
+    formData.append("descriptionHtmlText", value);
+    if (fileList[0] !== undefined) {
+      formData.append("cover-image", fileList[0]?.originFileObj);
+    }
+
     try {
       if (newPost.title.length > 0 && newPost.description.length > 0) {
         const data = await createNewPost(
@@ -159,6 +170,7 @@ const HeaderContents = () => {
             const fetchedPosts = await getAllPosts(0);
             setAllPosts([...fetchedPosts.data]);
             setIsModalOpen(false);
+            setIsLoading(false);
             message.success("Post Created");
           } catch (error) {
             console.log(error);
@@ -175,15 +187,20 @@ const HeaderContents = () => {
   };
 
   const handleEditPost = async () => {
-    const data = await editAPost(
-      singlePostDetails._id,
-      formData as unknown as INewPostPayload
-    );
+    setIsLoading(true);
+    const payload = {
+      title: newPost.title,
+      description: newPost.description,
+      descriptionHtmlText: value,
+    };
+
+    const data = await editAPost(singlePostDetails._id, payload);
     if (data.status === 200) {
       const fetchedPosts = await getAllPosts(0);
       setAllPosts([...fetchedPosts.data]);
       setPageNumber(0);
       setIsModalOpen(false);
+      setIsLoading(false);
       message.success("Post Updated");
     }
   };
@@ -191,14 +208,24 @@ const HeaderContents = () => {
   const footerButtons = () => {
     return isEditMode ? (
       <Form.Item className={styles.formItem}>
-        <Button type="primary" htmlType="submit" className={styles.formSubmit}>
-          Update
+        <Button
+          type="primary"
+          htmlType="submit"
+          className={styles.formSubmit}
+          loading={isLoading}
+        >
+          {isLoading ? "Updating" : "Update"}
         </Button>
       </Form.Item>
     ) : (
       <Form.Item className={styles.formItem}>
-        <Button type="primary" htmlType="submit" className={styles.formSubmit}>
-          Publish
+        <Button
+          type="primary"
+          htmlType="submit"
+          className={styles.formSubmit}
+          loading={isLoading}
+        >
+          {isLoading ? "Publishing" : "Publish"}
         </Button>
       </Form.Item>
     );

@@ -87,6 +87,11 @@
   box-shadow: none !important;
 }
 
+.searchedPostTitle {
+  font-size: 28px;
+  font-weight: 800;
+}
+
 .searchedPostTitle:hover {
   color: rgb(109, 64, 109);
   cursor: pointer;

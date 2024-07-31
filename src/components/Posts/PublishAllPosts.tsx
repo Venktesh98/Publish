@@ -7,20 +7,25 @@ import {
   IUserDetails,
 } from "@/interfaces/postsInterface";
 import {
+  blockUser,
   deleteAPost,
+  fetchAllUsers,
   followAUser,
   getAllPosts,
   likePost,
+  unBlockUser,
   unFollowAUser,
   unLikePost,
 } from "@/services/services";
 import { UserEnumValues } from "@/utils/constants";
 import { serializeDate } from "@/utils/helpers";
 import {
+  CheckCircleTwoTone,
   CommentOutlined,
   HeartFilled,
   HeartOutlined,
   MoreOutlined,
+  StopTwoTone,
   UserOutlined,
 } from "@ant-design/icons";
 import {
@@ -51,6 +56,7 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
     pageNumber,
     setIsModalOpen,
     userDetails,
+    setUserDetails,
     setSinglePostDetails,
     setIsEditMode,
   } = useContext(BlogCtx);
@@ -60,7 +66,7 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
 
   const [isCommentModalOpen, setIsCommentModalOpen] = useState<boolean>(false);
   const [postId, setPostId] = useState<string>("");
-  const { allUsers } = useContext(BlogCtx);
+  const { allUsers, userDetails: loggedInUserDetails } = useContext(BlogCtx);
 
   const handleFollowAUser = async (userIdOfUserToFollow: string) => {
     try {
@@ -86,6 +92,46 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
     }
   };
 
+  const handleBlockUser = async (userId: string) => {
+    try {
+      const data = await blockUser(userId);
+      if (data.status === 200) {
+        const allUsersDetails = await fetchAllUsers();
+
+        const loggedInUserDetails = allUsersDetails.find(
+          (userObj: IUserDetails) =>
+            userObj._id === sessionStorage.getItem("userId")
+        );
+        setUserDetails(loggedInUserDetails);
+
+        const fetchedPosts = await getAllPosts(pageNumber);
+        setAllPosts(fetchedPosts.data);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleUnBlockUser = async (userId: string) => {
+    try {
+      const data = await unBlockUser(userId);
+      if (data.status === 200) {
+        const allUsersDetails = await fetchAllUsers();
+
+        const loggedInUserDetails = allUsersDetails.find(
+          (userObj: IUserDetails) =>
+            userObj._id === sessionStorage.getItem("userId")
+        );
+        setUserDetails(loggedInUserDetails);
+
+        const fetchedPosts = await getAllPosts(pageNumber);
+        setAllPosts(fetchedPosts.data);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const showComments = (comments: IAllComments[]) => {
     if (comments.length > 1) {
       return `${comments.length} comments`;
@@ -97,7 +143,14 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
     const userDetails = allUsers.find(
       (commentedUserObj: IUserDetails) => commentedUserObj._id === commentedUser
     );
-    return userDetails.profilePhoto;
+    return {
+      photo: userDetails.profilePhoto,
+      name: userDetails.fullName,
+    };
+  };
+
+  const findBlockedUsers = (blockedUserId: string) => {
+    return loggedInUserDetails.blockedUsers.includes(blockedUserId);
   };
 
   const showLikesAndUnLikes = (postItem: IAllPosts) => {
@@ -126,17 +179,24 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
           <div className={styles.userComments} key={comment._id}>
             <div>
               <ImageControl
-                src={commentedUserDetails(comment.user as unknown as string)}
-                // src={postDetails.user.profilePhoto}
+                src={
+                  commentedUserDetails(comment.user as unknown as string).photo
+                }
                 width={30}
                 height={30}
                 alt="No Image"
-                photo={commentedUserDetails(comment.user as unknown as string)}
-                // photo={postDetails.user.profilePhoto}
+                photo={
+                  commentedUserDetails(comment.user as unknown as string).photo
+                }
                 isCircle={true}
               />
             </div>
-            <div className={styles.comments}>{comment.description}</div>
+            <div className={styles.commentsStyle}>
+              <div>
+                {commentedUserDetails(comment.user as unknown as string).name}
+              </div>
+              {comment.description}
+            </div>
           </div>
         ))}
       </div>
@@ -155,7 +215,15 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
                   isCircle={true}
                 />
               </div>
-              <div className={styles.comments}>{commentObj.description}</div>
+              <div className={styles.commentsStyle}>
+                <div>
+                  {
+                    commentedUserDetails(commentObj.user as unknown as string)
+                      .name
+                  }
+                </div>
+                {commentObj.description}
+              </div>
             </div>
           ))}
         </div>
@@ -274,7 +342,7 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
         <p>
           <ConfirmBox
             title="Delete Comment"
-            description="Are you sure you want to delete the comment?"
+            description="Are you sure you want to delete this comment?"
             handleConfirm={() => handleDeletePost(postItem._id)}
             handleConfirmCancel={() => {}}
           >
@@ -297,11 +365,11 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
         ))}
       </Space>
     );
-  } else if (!allPosts) {
+  } else if (!allPosts.length) {
     content = (
       <Empty
         image="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg"
-        imageStyle={{ height: 60 }}
+        imageStyle={{ height: 100, textAlign: "center" }}
       >
         <Button type="primary" onClick={() => setIsModalOpen(true)}>
           Create Now
@@ -351,7 +419,7 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
                 </Text>
               </div>
             </div>
-            {userDetails?._id === postItem.user._id && (
+            {userDetails?._id === postItem.user._id ? (
               <div className={styles.menuItem}>
                 <Popover
                   placement="bottom"
@@ -361,6 +429,30 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
                   <MoreOutlined />
                 </Popover>
               </div>
+            ) : (
+              <>
+                {findBlockedUsers(postItem.user._id) ? (
+                  <div
+                    className={styles.blocked}
+                    onClick={() => handleUnBlockUser(postItem.user._id)}
+                  >
+                    <div>
+                      <CheckCircleTwoTone />
+                    </div>
+                    <div>Unblock</div>
+                  </div>
+                ) : (
+                  <div
+                    className={styles.blocked}
+                    onClick={() => handleBlockUser(postItem.user._id)}
+                  >
+                    <div>
+                      <StopTwoTone />
+                    </div>
+                    <div>Block</div>
+                  </div>
+                )}
+              </>
             )}
           </div>
           <div className={styles.postInfoContainer}>

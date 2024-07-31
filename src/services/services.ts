@@ -51,7 +51,10 @@ export const deleteAPost = async (id: string) => {
 };
 
 export const editAPost = async (id: string, payload: INewPostPayload) => {
-  const { data } = await blogServiceUserCreateNewPostAPI.put(`/posts/${id}`, payload);
+  const { data } = await blogServiceUserCreateNewPostAPI.put(
+    `/posts/${id}`,
+    payload
+  );
 
   return data;
 };
@@ -124,6 +127,18 @@ export const loginUser = async (payload: ILoginFormValues) => {
 
 export const loggedInUserProfile = async () => {
   const { data } = await blogServiceAPI.get("/users/profile/");
+
+  return data;
+};
+
+export const blockUser = async (id: string) => {
+  const { data } = await blogServiceAPI.get(`/users/blocked/${id}`);
+
+  return data;
+};
+
+export const unBlockUser = async (id: string) => {
+  const { data } = await blogServiceAPI.get(`/users/unblocked/${id}`);
 
   return data;
 };
