@@ -18,7 +18,8 @@ const BlogRootComp = () => {
     setIsLoading(true);
     try {
       const fetchedPosts = await getAllPosts(pageNumber);
-      setAllPosts([...allPosts, ...fetchedPosts.data]);
+      setAllPosts([...fetchedPosts.data]);
+      // setAllPosts([...allPosts, ...fetchedPosts.data]);
       setIsLastPage(fetchedPosts.isLastPage);
     } catch (error) {
       console.log(error);

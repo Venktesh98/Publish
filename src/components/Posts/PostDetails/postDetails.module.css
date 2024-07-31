@@ -78,8 +78,26 @@
   align-items: center;
 }
 
+.commentedUserDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #c8c6c64a;
+  border-radius: 8px;
+  padding: 20px;
+}
+
 .commentedUserName {
   color: gray;
+  font-weight: 500;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+  gap: 15px;
+}
+
+.commentedUserName > span {
+  color: black;
   font-weight: 500;
 }
 

@@ -86,6 +86,21 @@
   cursor: pointer;
 }
 
+.blocked {
+  padding: 2px 20px;
+  background-color: rgba(116, 116, 116, 0.13);
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.blocked > :nth-child(1){
+  margin-top: 0.5px;
+}
+
 .userCommentsContainer {
   margin-top: 8px;
 }
@@ -96,13 +111,17 @@
   align-items: center;
 }
 
-.comments {
-  padding: 15px;
+.commentsStyle {
+  padding: 10px;
   background-color: rgba(219, 219, 219, 0.4);
   border-radius: 6px;
   margin-bottom: 8px;
   cursor: pointer;
   font-weight: 500;
+}
+
+.commentsStyle > div {
+  color: gray;
 }
 
 .seeAllComments {
