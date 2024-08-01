@@ -341,8 +341,8 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
         <p onClick={() => handleEdit(postItem)}>Edit</p>
         <p>
           <ConfirmBox
-            title="Delete Comment"
-            description="Are you sure you want to delete this comment?"
+            title="Delete Post"
+            description="Are you sure you want to delete this post?"
             handleConfirm={() => handleDeletePost(postItem._id)}
             handleConfirmCancel={() => {}}
           >
@@ -360,6 +360,10 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
       <Space direction="vertical" style={{ display: "flex" }} size={"small"}>
         {Array.from([1, 2, 3, 4, 5, 6]).map((_, index) => (
           <Card key={index}>
+            <Skeleton.Image
+              active={true}
+              style={{ width: 610, height: 350, marginBottom: "12px" }}
+            />
             <Skeleton active={true} avatar paragraph={{ rows: 3 }} />
           </Card>
         ))}

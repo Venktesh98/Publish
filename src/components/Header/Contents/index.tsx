@@ -18,6 +18,7 @@ import {
   LoginOutlined,
   LogoutOutlined,
   UpOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import {
   Avatar,
@@ -31,8 +32,9 @@ import {
   message,
 } from "antd";
 import { useRouter } from "next/navigation";
-import { use, useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import styles from "./headerContents.module.css";
+import Link from "next/link";
 
 type FieldType = {
   title: string;
@@ -92,13 +94,13 @@ const HeaderContents = () => {
   const formRef = useRef<FormInstance>(null);
   const {
     fileList,
-    formData,
     handleImageUpload,
     newPost,
     setNewPost,
     setValue,
     value,
     newPostInitialValues,
+    formData,
   } = useFormData();
 
   const {
@@ -150,15 +152,7 @@ const HeaderContents = () => {
   };
 
   const handlePublishNewPost = async () => {
-    const formData = new FormData();
     setIsLoading(true);
-
-    formData.append("title", newPost.title);
-    formData.append("description", newPost.description);
-    formData.append("descriptionHtmlText", value);
-    if (fileList[0] !== undefined) {
-      formData.append("cover-image", fileList[0]?.originFileObj);
-    }
 
     try {
       if (newPost.title.length > 0 && newPost.description.length > 0) {
@@ -188,13 +182,10 @@ const HeaderContents = () => {
 
   const handleEditPost = async () => {
     setIsLoading(true);
-    const payload = {
-      title: newPost.title,
-      description: newPost.description,
-      descriptionHtmlText: value,
-    };
-
-    const data = await editAPost(singlePostDetails._id, payload);
+    const data = await editAPost(
+      singlePostDetails._id,
+      formData as unknown as INewPostPayload
+    );
     if (data.status === 200) {
       const fetchedPosts = await getAllPosts(0);
       setAllPosts([...fetchedPosts.data]);
@@ -245,8 +236,18 @@ const HeaderContents = () => {
 
     if (token) {
       return (
-        <div onClick={handleRedirectToUserLogin} className={styles.logout}>
-          <LogoutOutlined /> Logout
+        <div className={styles.userDetailsContainer}>
+          <div>
+            <UserOutlined />
+            <span className={styles.userName}>
+              <Link href={`/user/details/${userDetails?._id}`}>
+                @{userDetails?.fullName}
+              </Link>
+            </span>
+          </div>
+          <div onClick={handleRedirectToUserLogin} className={styles.logout}>
+            <LogoutOutlined /> Logout
+          </div>
         </div>
       );
     } else {
@@ -370,7 +371,7 @@ const HeaderContents = () => {
       </div>
 
       <ModalWindow
-        title={"Create Post"}
+        title={isEditMode ? "Edit Post" : "Create Post"}
         isModalOpen={isModalOpen}
         handleCancel={handleCancel}
         footerButtons={undefined}

@@ -30,7 +30,7 @@ const RightPanel = () => {
           </Link>
         </Card.Grid>
         <Card.Grid style={gridStyle}>
-          <Link href="https://vuejs.org/about/community-guide">
+          <Link href="https://vuejs.org/about/community-guide" target="_blank">
             <div>
               <Text strong>Vue</Text>
             </div>
@@ -45,7 +45,7 @@ const RightPanel = () => {
           </Link>
         </Card.Grid>
         <Card.Grid style={gridStyle}>
-          <Link href="https://nodejs.org/en/about/get-involved">
+          <Link href="https://nodejs.org/en/about/get-involved" target="_blank">
             <div>
               <Text strong>Node</Text>
             </div>
@@ -62,27 +62,27 @@ const RightPanel = () => {
       </Card>
 
       <Card title="Active Discussions">
-        <Card.Grid style={gridStyle} hoverable={false}>
+        <Card.Grid style={gridStyle} hoverable={true}>
           <Text>
             Rendering the images in the good way in your React application.
           </Text>
         </Card.Grid>
 
-        <Card.Grid style={gridStyle} hoverable={false}>
+        <Card.Grid style={gridStyle} hoverable={true}>
           <Text>
             Write Less, Fix never the art of writing highly reliable code.
           </Text>
         </Card.Grid>
 
-        <Card.Grid style={gridStyle} hoverable={false}>
+        <Card.Grid style={gridStyle} hoverable={true}>
           <Text>Responding to an Events in vanilla Javascript vs React</Text>
         </Card.Grid>
 
-        <Card.Grid style={gridStyle} hoverable={false}>
+        <Card.Grid style={gridStyle} hoverable={true}>
           <Text>Exciting News, my brand new website is live.</Text>
         </Card.Grid>
 
-        <Card.Grid style={gridStyle} hoverable={false}>
+        <Card.Grid style={gridStyle} hoverable={true}>
           <Text>
             Making use of React Hooks in a proper way for better code and
             flexibility.

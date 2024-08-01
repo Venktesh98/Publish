@@ -21,4 +21,8 @@ export interface IFileDetails {
   webkitRelativePath: string;
 }
 
-
+export interface IUpdateUserFields {
+  firstName: string;
+  lastName: string;
+  email: string;
+}
