@@ -11,7 +11,7 @@ const ImageControl = (props: IImageProps) => {
           ...(props.photo && !props.isCircle
             ? { border: "1px solid white" }
             : props.photo && props.isCircle
-            ? { borderRadius: "50px" }
+            ? { borderRadius: "50%" }
             : { display: "none" }),
         }}
       />

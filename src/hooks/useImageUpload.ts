@@ -33,12 +33,11 @@ export const useImageUpload = (name: string, route: string) => {
           }
         );
         message.success(response.message);
-        setUploadProgress(0);
       } catch (error) {
         message.error("Upload failed");
       }
     }
   };
 
-  return { handleImageUpload, fileList };
+  return { handleImageUpload, fileList, setFileList };
 };

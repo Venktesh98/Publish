@@ -129,3 +129,18 @@
 .formItem {
   margin-bottom: 5px;
 }
+
+.userDetailsContainer {
+  line-height: 2.2;
+}
+
+.userName {
+  color: gray;
+  font-weight: 500;
+  line-height: 24px;
+  cursor: pointer;
+}
+
+.userName:hover {
+  color: rgb(94, 155, 245);
+}

@@ -152,6 +152,7 @@ const PublishSignup = () => {
                     fileList={fileList}
                     accept={".png,.jpeg,.jpg,.webp"}
                     beforeUpload={() => false}
+                    maxCount={1}
                   >
                     <Button icon={<UploadOutlined />}>Upload</Button>
                   </Upload>

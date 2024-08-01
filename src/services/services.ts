@@ -4,6 +4,7 @@ import {
   IFileDetails,
   ILoginFormValues,
   ISubmitSignupFormValues,
+  IUpdateUserFields,
 } from "@/interfaces/formInterface";
 import { ISearchPayload } from "@/interfaces/postsInterface";
 import {
@@ -72,6 +73,12 @@ export const unLikePost = async (postId: string) => {
 };
 
 // USERS
+export const updateUserDetails = async (payload: IUpdateUserFields) => {
+  const { data } = await blogServiceAPI.put(`/users/`, payload);
+
+  return data;
+};
+
 export const followAUser = async (userId: string) => {
   const { data } = await blogServiceAPI.get(`/users/following/${userId}`);
 
