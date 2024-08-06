@@ -1,6 +1,7 @@
 import { ICommentsPayload } from "@/interfaces/commentsInterface";
 import { INewPostPayload } from "@/interfaces/createPostInterface";
 import {
+  ICategoryPayload,
   IFileDetails,
   ILoginFormValues,
   ISubmitSignupFormValues,
@@ -168,3 +169,17 @@ export const editComment = async (id: string, payload: ICommentsPayload) => {
 
   return data;
 };
+
+// CATEGORIES
+export const fetchCategories = async () => {
+  const { data } = await blogServiceAPI.get(`/categories/`);
+
+  return data;
+};
+
+export const createNewCategory = async (payload: ICategoryPayload) => {
+  const { data } = await blogServiceAPI.post(`/categories/`, payload);
+
+  return data;
+};
+

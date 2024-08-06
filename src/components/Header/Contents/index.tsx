@@ -5,8 +5,10 @@ import PopOverControl from "@/components/shared/PopOverControl";
 import { BlogCtx } from "@/context/blogContext";
 import { useImageUpload } from "@/hooks/useImageUpload";
 import { INewPostPayload } from "@/interfaces/createPostInterface";
+import { ICategoryDetails } from "@/interfaces/formInterface";
 import { IAllPosts, ISearchedPostResults } from "@/interfaces/postsInterface";
 import {
+  createNewCategory,
   createNewPost,
   editAPost,
   getAllPosts,
@@ -17,6 +19,7 @@ import {
   FrownOutlined,
   LoginOutlined,
   LogoutOutlined,
+  PlusOutlined,
   UpOutlined,
   UserOutlined,
 } from "@ant-design/icons";
@@ -25,16 +28,19 @@ import {
   Button,
   Card,
   Form,
-  FormInstance,
   Input,
+  InputRef,
   Progress,
+  Tag,
   Upload,
   message,
+  theme,
 } from "antd";
+import { useForm } from "antd/es/form/Form";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect, useRef, useState } from "react";
 import styles from "./headerContents.module.css";
-import Link from "next/link";
 
 type FieldType = {
   title: string;
@@ -49,13 +55,23 @@ const useFormData = () => {
     title: "",
     description: "",
     descriptionHtmlText: "",
-    category: "",
+    category: [
+      {
+        _id: "",
+        title: "",
+        user: "",
+        isDefault: false,
+        createdAt: "",
+        updatedAt: "",
+      },
+    ],
     photo: "",
   };
 
   const [newPost, setNewPost] = useState<INewPostPayload>(newPostInitialValues);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [value, setValue] = useState<string>(" ");
-  const { fileList, handleImageUpload } = useImageUpload(
+  const { fileList, handleImageUpload, setFileList } = useImageUpload(
     "cover-image",
     "posts"
   );
@@ -65,6 +81,7 @@ const useFormData = () => {
   formData.append("title", newPost.title);
   formData.append("description", newPost.description);
   formData.append("descriptionHtmlText", value);
+  formData.append("category", selectedTags.join(","));
   if (fileList[0] !== undefined) {
     formData.append("cover-image", fileList[0]?.originFileObj);
   }
@@ -75,10 +92,20 @@ const useFormData = () => {
     value,
     setValue,
     fileList,
+    setFileList,
     handleImageUpload,
     formData,
     newPostInitialValues,
+    selectedTags,
+    setSelectedTags,
   };
+};
+
+const tagInputStyle: React.CSSProperties = {
+  width: 64,
+  height: 22,
+  marginInlineEnd: 8,
+  verticalAlign: "top",
 };
 
 const HeaderContents = () => {
@@ -91,9 +118,16 @@ const HeaderContents = () => {
     ISearchedPostResults[]
   >([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const formRef = useRef<FormInstance>(null);
+  const [tags, setTags] = useState<ICategoryDetails[]>([]);
+  const [inputVisible, setInputVisible] = useState<boolean>(false);
+  const [inputValue, setInputValue] = useState<string>("");
+  const inputRef = useRef<InputRef>(null);
+  const [form] = useForm();
+  const { token } = theme.useToken();
+
   const {
     fileList,
+    setFileList,
     handleImageUpload,
     newPost,
     setNewPost,
@@ -101,6 +135,8 @@ const HeaderContents = () => {
     value,
     newPostInitialValues,
     formData,
+    selectedTags,
+    setSelectedTags,
   } = useFormData();
 
   const {
@@ -116,6 +152,7 @@ const HeaderContents = () => {
     setPageNumber,
     uploadProgress,
     setUploadProgress,
+    categories,
   } = useContext(BlogCtx);
 
   const handleOnSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -136,16 +173,52 @@ const HeaderContents = () => {
     router.push(`/${userDetails.id}`);
   };
 
+  const showInput = () => {
+    setInputVisible(true);
+  };
+
+  const handleCategoryChange = (tag: string, checked: boolean) => {
+    const nextSelectedTags = checked
+      ? [...selectedTags, tag]
+      : selectedTags.filter((t) => t !== tag);
+    setSelectedTags(nextSelectedTags);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+  };
+
+  const handleInputConfirm = async () => {
+    if (inputValue.length > 0) {
+      const payload = {
+        title: inputValue,
+      };
+
+      try {
+        const categoriesData = await createNewCategory(payload);
+        if (categoriesData.status === 200) {
+          setTags([...tags, categoriesData?.data]);
+          setInputVisible(false);
+          setInputValue("");
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
+
   const handleOpenModal = () => {
     setIsModalOpen(true);
   };
 
   const handleCancel = () => {
     setIsModalOpen(false);
+    setFileList([]);
     setNewPost({ ...newPostInitialValues });
     setValue("");
     setSinglePostDetails("");
     setUploadProgress(0);
+    setSelectedTags([]);
     if (isEditMode) {
       setIsEditMode(false);
     }
@@ -163,7 +236,7 @@ const HeaderContents = () => {
           try {
             const fetchedPosts = await getAllPosts(0);
             setAllPosts([...fetchedPosts.data]);
-            setIsModalOpen(false);
+            handleCancel();
             setIsLoading(false);
             message.success("Post Created");
           } catch (error) {
@@ -173,10 +246,12 @@ const HeaderContents = () => {
       }
     } catch (error) {
       console.error(error);
+      setIsLoading(false);
     } finally {
       setNewPost({ ...newPostInitialValues });
       setValue("");
-      formRef.current?.resetFields();
+      form.resetFields();
+      setIsLoading(false);
     }
   };
 
@@ -190,7 +265,7 @@ const HeaderContents = () => {
       const fetchedPosts = await getAllPosts(0);
       setAllPosts([...fetchedPosts.data]);
       setPageNumber(0);
-      setIsModalOpen(false);
+      handleCancel();
       setIsLoading(false);
       message.success("Post Updated");
     }
@@ -215,6 +290,7 @@ const HeaderContents = () => {
           htmlType="submit"
           className={styles.formSubmit}
           loading={isLoading}
+          disabled={!newPost.title.length && !newPost.description.length}
         >
           {isLoading ? "Publishing" : "Publish"}
         </Button>
@@ -278,7 +354,7 @@ const HeaderContents = () => {
   }, [searchValue]);
 
   useEffect(() => {
-    if (Object.keys(singlePostDetails).length > 0) {
+    if (isEditMode && Object.keys(singlePostDetails).length > 0) {
       const postDetails = allPosts.find(
         (post: IAllPosts) => post._id === singlePostDetails._id
       );
@@ -286,9 +362,48 @@ const HeaderContents = () => {
         ...newPost,
         title: postDetails?.title,
       });
+      setSelectedTags([
+        ...postDetails.category.map(
+          (categoryId: ICategoryDetails) => categoryId._id
+        ),
+      ]);
       setValue(postDetails.descriptionHtmlText);
     }
-  }, [singlePostDetails]);
+  }, [singlePostDetails, isEditMode]);
+
+  useEffect(() => {
+    const allCategories = categories.filter(
+      (tags: ICategoryDetails) => tags.isDefault === true
+    );
+
+    if (isEditMode) {
+      const postDetails = allPosts.find(
+        (post: IAllPosts) => post._id === singlePostDetails._id
+      );
+
+      const combineCategories = [...allCategories, ...postDetails.category];
+      const filteredTags = combineCategories.reduce((acc, current) => {
+        const isDuplicate = acc.some(
+          (tag: ICategoryDetails) => tag._id === current._id
+        );
+        if (!isDuplicate) {
+          acc.push(current);
+        }
+        return acc;
+      }, []);
+
+      setTags(filteredTags);
+    } else {
+      setTags(allCategories);
+    }
+  }, [categories, isModalOpen, isEditMode, allPosts]);
+
+  const tagPlusStyle: React.CSSProperties = {
+    height: 22,
+    background: token.colorBgContainer,
+    borderStyle: "dashed",
+    cursor: "pointer",
+  };
 
   return (
     <>
@@ -380,7 +495,7 @@ const HeaderContents = () => {
         <Form
           name="create-post"
           onFinish={isEditMode ? handleEditPost : handlePublishNewPost}
-          ref={formRef}
+          form={form}
           initialValues={newPostInitialValues}
         >
           <Card bordered={true}>
@@ -392,7 +507,6 @@ const HeaderContents = () => {
                   placeholder="New Post Title...."
                   autoSize
                   value={newPost.title}
-                  autoFocus
                 />
               </div>
             </Form.Item>
@@ -426,6 +540,46 @@ const HeaderContents = () => {
                   )}
                 </div>
               </div>
+            </Form.Item>
+
+            <Form.Item<FieldType> name="category">
+              {tags?.map((tag: ICategoryDetails, index) => {
+                return (
+                  <Tag.CheckableTag
+                    key={tag._id}
+                    checked={selectedTags?.includes(tag._id)}
+                    // checked={
+                    //   selectedTags.length > 0 && selectedTags?.includes(tag._id)
+                    // }
+                    onChange={(checked) =>
+                      handleCategoryChange(tag._id, checked)
+                    }
+                  >
+                    #{tag.title}
+                  </Tag.CheckableTag>
+                );
+              })}
+
+              {inputVisible ? (
+                <Input
+                  ref={inputRef}
+                  type="text"
+                  size="small"
+                  style={tagInputStyle}
+                  value={inputValue}
+                  onChange={handleInputChange}
+                  onBlur={handleInputConfirm}
+                  onPressEnter={handleInputConfirm}
+                />
+              ) : (
+                <Tag
+                  style={tagPlusStyle}
+                  icon={<PlusOutlined />}
+                  onClick={showInput}
+                >
+                  New Category
+                </Tag>
+              )}
             </Form.Item>
 
             <Form.Item<FieldType> className={styles.formItem}>
