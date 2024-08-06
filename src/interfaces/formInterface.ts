@@ -26,3 +26,16 @@ export interface IUpdateUserFields {
   lastName: string;
   email: string;
 }
+
+export interface ICategoryDetails {
+  _id: string;
+  title: string;
+  user: string;
+  isDefault: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ICategoryPayload {
+  title: string;
+}

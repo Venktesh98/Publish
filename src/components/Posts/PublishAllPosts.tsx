@@ -150,7 +150,7 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
   };
 
   const findBlockedUsers = (blockedUserId: string) => {
-    return loggedInUserDetails.blockedUsers.includes(blockedUserId);
+    return loggedInUserDetails?.blockedUsers?.includes(blockedUserId);
   };
 
   const showLikesAndUnLikes = (postItem: IAllPosts) => {

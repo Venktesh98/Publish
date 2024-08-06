@@ -14,6 +14,7 @@ const BlogProvider = ({ children }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isGlobalLoading, setIsGlobalLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [categories, setCategories] = useState([]);
 
   return (
     <BlogCtx.Provider
@@ -35,7 +36,9 @@ const BlogProvider = ({ children }) => {
         setIsGlobalLoading,
         isGlobalLoading,
         setUploadProgress,
-        uploadProgress
+        uploadProgress,
+        setCategories,
+        categories,
       }}
     >
       {children}

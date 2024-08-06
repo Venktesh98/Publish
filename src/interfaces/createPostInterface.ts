@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { ICommentsPayload } from "./commentsInterface";
+import { ICategoryDetails } from "./formInterface";
 
 export interface IModalWindowProps {
   title: string;
@@ -14,7 +15,7 @@ export interface INewPostPayload {
   title: string;
   description: string;
   descriptionHtmlText: string;
-  category?: string;
+  category: ICategoryDetails[];
   photo?: string;
 }
 

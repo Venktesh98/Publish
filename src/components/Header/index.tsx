@@ -1,6 +1,6 @@
 "use client";
 import { BlogCtx } from "@/context/blogContext";
-import { getAllPosts } from "@/services/services";
+import { fetchCategories, getAllPosts } from "@/services/services";
 import { Layout } from "antd";
 import { useContext, useEffect, useState } from "react";
 import AllPosts from "../Posts";
@@ -8,7 +8,7 @@ import AllPosts from "../Posts";
 const BlogRootComp = () => {
   const { Content, Footer } = Layout;
 
-  const { setAllPosts, allPosts, pageNumber, setPageNumber } =
+  const { setAllPosts, allPosts, pageNumber, setPageNumber, setCategories } =
     useContext(BlogCtx);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isLastPage, setIsLastPage] = useState<boolean>(false);
@@ -25,6 +25,13 @@ const BlogRootComp = () => {
       console.log(error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchAllCategories = async () => {
+    const data = await fetchCategories();
+    if (data.status === 200) {
+      setCategories(data.data);
     }
   };
 
@@ -49,6 +56,7 @@ const BlogRootComp = () => {
 
   useEffect(() => {
     fetchPosts();
+    fetchAllCategories();
   }, []);
 
   // useEffect(() => {
