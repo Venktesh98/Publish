@@ -8,7 +8,6 @@ const BlogProvider = ({ children }) => {
   const [userDetails, setUserDetails] = useState(null);
   const [allUsers, setAllUsers] = useState(null);
   const [allPosts, setAllPosts] = useState([]);
-  const [pageNumber, setPageNumber] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [singlePostDetails, setSinglePostDetails] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
@@ -25,8 +24,6 @@ const BlogProvider = ({ children }) => {
         setAllUsers,
         allPosts,
         setAllPosts,
-        setPageNumber,
-        pageNumber,
         setIsModalOpen,
         isModalOpen,
         setSinglePostDetails,

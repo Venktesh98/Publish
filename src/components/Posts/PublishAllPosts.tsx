@@ -53,7 +53,6 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
   const {
     allPosts,
     setAllPosts,
-    pageNumber,
     setIsModalOpen,
     userDetails,
     setUserDetails,
@@ -66,33 +65,42 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
 
   const [isCommentModalOpen, setIsCommentModalOpen] = useState<boolean>(false);
   const [postId, setPostId] = useState<string>("");
+  const [loading, setLoading] = useState({ isFollow: false, isBlock: false });
   const { allUsers, userDetails: loggedInUserDetails } = useContext(BlogCtx);
 
   const handleFollowAUser = async (userIdOfUserToFollow: string) => {
+    setLoading({ ...loading, isFollow: true });
     try {
       const data = await followAUser(userIdOfUserToFollow);
       if (data.status === 200) {
-        const fetchedPosts = await getAllPosts(pageNumber);
+        const fetchedPosts = await getAllPosts(0);
         setAllPosts(fetchedPosts.data);
+        setLoading({ ...loading, isFollow: false });
       }
     } catch (error) {
       console.error(error);
+      setLoading({ ...loading, isFollow: false });
     }
   };
 
   const handleUnFollowAUser = async (userIdOfUserToUnFollow: string) => {
+    setLoading({ ...loading, isFollow: true });
     try {
       const data = await unFollowAUser(userIdOfUserToUnFollow);
       if (data.status === 200) {
-        const fetchedPosts = await getAllPosts(pageNumber);
+        const fetchedPosts = await getAllPosts(0);
         setAllPosts(fetchedPosts.data);
+        setLoading({ ...loading, isFollow: false });
       }
     } catch (error) {
       console.error(error);
+      setLoading({ ...loading, isFollow: false });
     }
   };
 
   const handleBlockUser = async (userId: string) => {
+    setLoading({ ...loading, isBlock: true });
+
     try {
       const data = await blockUser(userId);
       if (data.status === 200) {
@@ -104,15 +112,19 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
         );
         setUserDetails(loggedInUserDetails);
 
-        const fetchedPosts = await getAllPosts(pageNumber);
+        const fetchedPosts = await getAllPosts(0);
         setAllPosts(fetchedPosts.data);
+        setLoading({ ...loading, isBlock: false });
       }
     } catch (error) {
       console.error(error);
+      setLoading({ ...loading, isBlock: false });
     }
   };
 
   const handleUnBlockUser = async (userId: string) => {
+    setLoading({ ...loading, isBlock: true });
+
     try {
       const data = await unBlockUser(userId);
       if (data.status === 200) {
@@ -124,11 +136,13 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
         );
         setUserDetails(loggedInUserDetails);
 
-        const fetchedPosts = await getAllPosts(pageNumber);
+        const fetchedPosts = await getAllPosts(0);
         setAllPosts(fetchedPosts.data);
+        setLoading({ ...loading, isBlock: false });
       }
     } catch (error) {
       console.error(error);
+      setLoading({ ...loading, isBlock: false });
     }
   };
 
@@ -257,7 +271,9 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
               className={styles.followBtn}
               onClick={() => handleUnFollowAUser(userDetails._id)}
             >
-              {UserEnumValues.UNFOLLOW}
+              {loading.isFollow
+                ? UserEnumValues.PROGRESS
+                : UserEnumValues.UNFOLLOW}
             </Button>
           )}
           {formatJoinedDate(userDetails)}
@@ -272,7 +288,9 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
               className={styles.followBtn}
               onClick={() => handleFollowAUser(userDetails._id)}
             >
-              {UserEnumValues.FOLLOW}
+              {loading.isFollow
+                ? UserEnumValues.PROGRESS
+                : UserEnumValues.FOLLOW}
             </Button>
           )}
 
@@ -286,7 +304,7 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
     const data = await deleteAPost(postId);
     if (data.status === 200) {
       message.success("Post Deleted");
-      const fetchedPosts = await getAllPosts(pageNumber);
+      const fetchedPosts = await getAllPosts(0);
       setAllPosts(fetchedPosts.data);
     }
   };
@@ -318,7 +336,7 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
 
     const data = await likePost(postDetails._id);
     if (data.status === 200) {
-      const fetchedPosts = await getAllPosts(pageNumber);
+      const fetchedPosts = await getAllPosts(0);
       setAllPosts(fetchedPosts.data);
     }
   };
@@ -330,7 +348,7 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
 
     const data = await unLikePost(postDetails._id);
     if (data.status === 200) {
-      const fetchedPosts = await getAllPosts(pageNumber);
+      const fetchedPosts = await getAllPosts(0);
       setAllPosts(fetchedPosts.data);
     }
   };
@@ -443,7 +461,7 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
                     <div>
                       <CheckCircleTwoTone />
                     </div>
-                    <div>Unblock</div>
+                    <div>{loading.isBlock ? "...Unblocking" : "Unblock"}</div>
                   </div>
                 ) : (
                   <div
@@ -453,7 +471,7 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
                     <div>
                       <StopTwoTone />
                     </div>
-                    <div>Block</div>
+                    <div>{loading.isBlock ? "...Blocking" : "Block"}</div>
                   </div>
                 )}
               </>

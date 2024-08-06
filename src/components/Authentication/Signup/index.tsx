@@ -52,7 +52,7 @@ const PublishSignup = () => {
   );
 
   const router = useRouter();
-  const { uploadProgress } = useContext(BlogCtx);
+  const { uploadProgress, setUploadProgress } = useContext(BlogCtx);
 
   const handleFormSubmit = async (values: ISubmitSignupFormValues) => {
     const formData = new FormData();
@@ -73,6 +73,7 @@ const PublishSignup = () => {
       setIsLoading(false);
       formRef?.current?.resetFields();
       setFileList([]);
+      setUploadProgress(0);
       router.push("/signin");
     } catch (error: any) {
       message.error(error.response.data.message ?? "Something went wrong");

@@ -1,25 +1,24 @@
 "use client";
 import { BlogCtx } from "@/context/blogContext";
 import { fetchCategories, getAllPosts } from "@/services/services";
-import { Layout } from "antd";
+import { Card, Divider, Layout, Skeleton } from "antd";
 import { useContext, useEffect, useState } from "react";
+import InfiniteScroll from "react-infinite-scroll-component";
 import AllPosts from "../Posts";
 
 const BlogRootComp = () => {
   const { Content, Footer } = Layout;
 
-  const { setAllPosts, allPosts, pageNumber, setPageNumber, setCategories } =
-    useContext(BlogCtx);
+  const { setAllPosts, allPosts, setCategories } = useContext(BlogCtx);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isLastPage, setIsLastPage] = useState<boolean>(false);
-  const [isScrolled, setIsScrolled] = useState<boolean>(false);
+  const [pn] = useState(0);
 
-  const fetchPosts = async () => {
+  const fetchPosts = async (pn: number) => {
     setIsLoading(true);
     try {
-      const fetchedPosts = await getAllPosts(pageNumber);
-      setAllPosts([...fetchedPosts.data]);
-      // setAllPosts([...allPosts, ...fetchedPosts.data]);
+      const fetchedPosts = await getAllPosts(pn);
+      setAllPosts([...allPosts, ...fetchedPosts.data]);
       setIsLastPage(fetchedPosts.isLastPage);
     } catch (error) {
       console.log(error);
@@ -35,47 +34,33 @@ const BlogRootComp = () => {
     }
   };
 
-  // const handleScroll = () => {
-  //   if (
-  //     window.innerHeight + document.documentElement.scrollTop !==
-  //       document.documentElement.offsetHeight ||
-  //     isLoading
-  //   ) {
-  //     return;
-  //   }
-
-  //   if (isLastPage) {
-  //     return;
-  //   }
-  //   setIsScrolled(true);
-  //   fetchPosts().then(() => {
-  //     window.scrollBy(0, 2);
-  //     setIsScrolled(false);
-  //   });
-  // };
-
   useEffect(() => {
-    fetchPosts();
+    fetchPosts(pn);
     fetchAllCategories();
   }, []);
-
-  // useEffect(() => {
-  //   window.addEventListener("scroll", handleScroll);
-  //   return () => window.removeEventListener("scroll", handleScroll);
-  // }, [isLoading]);
-
-  // useEffect(() => {
-  //   if (isScrolled) {
-  //     setPageNumber(pageNumber + 1);
-  //   }
-  // }, [isScrolled]);
 
   return (
     <div>
       <Layout>
         <Content>
           <div>
-            <AllPosts allPosts={allPosts} isLoading={isLoading} />
+            <InfiniteScroll
+              dataLength={allPosts.length}
+              next={() => fetchPosts(pn + 1)}
+              hasMore={!isLastPage}
+              loader={
+                <Card>
+                  <Skeleton.Image
+                    active={true}
+                    style={{ width: 610, height: 350, marginBottom: "12px" }}
+                  />
+                  <Skeleton active={true} avatar paragraph={{ rows: 3 }} />
+                </Card>
+              }
+              scrollableTarget="window"
+            >
+              <AllPosts allPosts={allPosts} isLoading={isLoading} />
+            </InfiniteScroll>
           </div>
         </Content>
         <Footer style={{ textAlign: "center" }}>
