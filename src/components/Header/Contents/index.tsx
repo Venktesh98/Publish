@@ -149,7 +149,6 @@ const HeaderContents = () => {
     allPosts,
     isEditMode,
     setIsEditMode,
-    setPageNumber,
     uploadProgress,
     setUploadProgress,
     categories,
@@ -264,7 +263,6 @@ const HeaderContents = () => {
     if (data.status === 200) {
       const fetchedPosts = await getAllPosts(0);
       setAllPosts([...fetchedPosts.data]);
-      setPageNumber(0);
       handleCancel();
       setIsLoading(false);
       message.success("Post Updated");
@@ -548,9 +546,6 @@ const HeaderContents = () => {
                   <Tag.CheckableTag
                     key={tag._id}
                     checked={selectedTags?.includes(tag._id)}
-                    // checked={
-                    //   selectedTags.length > 0 && selectedTags?.includes(tag._id)
-                    // }
                     onChange={(checked) =>
                       handleCategoryChange(tag._id, checked)
                     }

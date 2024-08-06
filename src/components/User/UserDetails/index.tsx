@@ -30,7 +30,6 @@ import { BlogCtx } from "@/context/blogContext";
 const initialValues = {
   firstName: "",
   lastName: "",
-  email: "",
 };
 
 const UserDetails = () => {
@@ -60,7 +59,6 @@ const UserDetails = () => {
 
     formData.append("firstName", values.firstName);
     formData.append("lastName", values.lastName);
-    formData.append("email", values.email);
 
     if (fileList[0] !== undefined) {
       formData.append("profile-photo", fileList[0]?.originFileObj);
@@ -184,6 +182,7 @@ const UserDetails = () => {
                         prefix={<MailOutlined />}
                         placeholder="Email"
                         type="email"
+                        disabled
                       />
                     </Form.Item>
 

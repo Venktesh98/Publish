@@ -19,7 +19,7 @@ const Comments = ({
   });
   const [value, setValue] = useState<string>("");
 
-  const { pageNumber, setAllPosts } = useContext(BlogCtx);
+  const { setAllPosts } = useContext(BlogCtx);
 
   const handleCancel = () => {
     setIsCommentModalOpen(false);
@@ -33,7 +33,7 @@ const Comments = ({
 
     const data = await addNewComment(postId, payload);
     if (data.status === 200) {
-      const fetchedPosts = await getAllPosts(pageNumber);
+      const fetchedPosts = await getAllPosts(0);
       setAllPosts(fetchedPosts.data);
       handleCancel();
     }

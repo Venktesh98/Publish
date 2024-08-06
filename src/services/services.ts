@@ -28,7 +28,7 @@ export const getAllPosts = async (currentPage: number) => {
   const { data } = await blogServiceAPI.get(
     `/posts?page=${currentPage}&pageSize=${10}`
   );
-
+  
   return {
     data: data.data.posts,
     isLastPage: data.data.isLastPage,
