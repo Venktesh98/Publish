@@ -25,11 +25,26 @@ export const blogServiceUserRegisterAPI = axios.create({
 });
 
 export const blogServiceUserCreateNewPostAPI = axios.create({
-  baseURL: `${process.env.NEXT_PUBLIC_blog_service_url}`,
+  baseURL: process.env.NEXT_PUBLIC_blog_service_url,
   headers: {
     "Content-Type": "multipart/form-data",
-    Authorization: `Bearer ${
-      typeof window !== "undefined" && sessionStorage.getItem("token")
-    }`,
   },
 });
+
+// Adding an interceptor to set the Authorization header
+blogServiceUserCreateNewPostAPI.interceptors.request.use(
+  (config) => {
+    if (typeof window !== "undefined") {
+      const token = sessionStorage.getItem("token");
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+export default blogServiceUserCreateNewPostAPI;

@@ -46,7 +46,7 @@ const PublishSignup = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const formRef = useRef<FormInstance>(null);
 
-  const { fileList, handleImageUpload } = useImageUpload(
+  const { fileList, setFileList, handleImageUpload } = useImageUpload(
     "profile-pic",
     "users"
   );
@@ -67,12 +67,12 @@ const PublishSignup = () => {
     }
 
     setIsLoading(true);
-
     try {
       await registerUser(formData as unknown as ISubmitSignupFormValues);
       message.success("Registered Successfully");
       setIsLoading(false);
       formRef?.current?.resetFields();
+      setFileList([]);
       router.push("/signin");
     } catch (error: any) {
       message.error(error.response.data.message ?? "Something went wrong");
