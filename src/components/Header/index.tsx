@@ -1,10 +1,11 @@
 "use client";
 import { BlogCtx } from "@/context/blogContext";
 import { fetchCategories, getAllPosts } from "@/services/services";
-import { Card, Divider, Layout, Skeleton } from "antd";
+import { Card, Layout, Skeleton } from "antd";
 import { useContext, useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import AllPosts from "../Posts";
+import { IAllPosts } from "@/interfaces/postsInterface";
 
 const BlogRootComp = () => {
   const { Content, Footer } = Layout;
@@ -18,7 +19,19 @@ const BlogRootComp = () => {
     setIsLoading(true);
     try {
       const fetchedPosts = await getAllPosts(pn);
-      setAllPosts([...allPosts, ...fetchedPosts.data]);
+
+      const combinedAllPosts = [...allPosts, ...fetchedPosts.data];
+      const filteredPosts = combinedAllPosts.reduce((acc, current) => {
+        const isDuplicate = acc.find(
+          (post: IAllPosts) => post._id === current._id
+        );
+        if (!isDuplicate) {
+          acc.push(current);
+        }
+        return acc;
+      }, []);
+
+      setAllPosts(filteredPosts);
       setIsLastPage(fetchedPosts.isLastPage);
     } catch (error) {
       console.log(error);

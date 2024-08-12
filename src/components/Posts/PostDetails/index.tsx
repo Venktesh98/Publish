@@ -217,13 +217,14 @@ const PostDetails = () => {
                     </Button>
                   )}
                 </div>
-                <div onClick={() => setOpenDrawer(true)}>
-                  <CommentOutlined
-                    style={{ fontSize: "19px", cursor: "pointer" }}
-                  />
-                </div>
               </div>
             )}
+
+            <div onClick={() => setOpenDrawer(true)}>
+              <CommentOutlined
+                style={{ fontSize: "19px", cursor: "pointer" }}
+              />
+            </div>
           </div>
 
           <div>

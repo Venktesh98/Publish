@@ -151,6 +151,18 @@ export const unBlockUser = async (id: string) => {
   return data;
 };
 
+export const bookmarkPost = async (id: string) => {
+  const { data } = await blogServiceAPI.get(`/users/bookmark/${id}`);
+
+  return data;
+};
+
+export const removeBookmarkPost = async (id: string) => {
+  const { data } = await blogServiceAPI.get(`/users/remove-bookmark/${id}`);
+
+  return data;
+};
+
 // COMMENTS
 export const addNewComment = async (id: string, payload: ICommentsPayload) => {
   const { data } = await blogServiceAPI.post(`/comments/${id}`, payload);

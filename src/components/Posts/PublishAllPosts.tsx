@@ -8,11 +8,13 @@ import {
 } from "@/interfaces/postsInterface";
 import {
   blockUser,
+  bookmarkPost,
   deleteAPost,
   fetchAllUsers,
   followAUser,
   getAllPosts,
   likePost,
+  removeBookmarkPost,
   unBlockUser,
   unFollowAUser,
   unLikePost,
@@ -30,6 +32,7 @@ import {
 } from "@ant-design/icons";
 import {
   Avatar,
+  Badge,
   Button,
   Card,
   Empty,
@@ -40,12 +43,14 @@ import {
   message,
 } from "antd";
 import { useParams, useRouter } from "next/navigation";
-import { useContext, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import ConfirmBox from "../shared/ConfirmationDialog";
 import ImageControl from "../shared/ImageControl";
 import PopOverControl from "../shared/PopOverControl";
 import Comments from "./Comments";
 import styles from "./posts.module.css";
+import Bookmark from "@/utils/icons/Bookmark";
+import Bookmarked from "@/utils/icons/Bookmarked";
 
 const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
   const { Title, Text } = Typography;
@@ -154,12 +159,12 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
   };
 
   const commentedUserDetails = (commentedUser: string) => {
-    const userDetails = allUsers.find(
+    const userDetails = allUsers?.find(
       (commentedUserObj: IUserDetails) => commentedUserObj._id === commentedUser
     );
     return {
-      photo: userDetails.profilePhoto,
-      name: userDetails.fullName,
+      photo: userDetails?.profilePhoto,
+      name: userDetails?.fullName,
     };
   };
 
@@ -353,6 +358,30 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
     }
   };
 
+  const handleBookmarkPost = async (postId: string) => {
+    try {
+      const data = await bookmarkPost(postId);
+      if (data.status === 200) {
+        const fetchedPosts = await getAllPosts(0);
+        setAllPosts(fetchedPosts.data);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleRemoveBookmarkPost = async (postId: string) => {
+    try {
+      const data = await removeBookmarkPost(postId);
+      if (data.status === 200) {
+        const fetchedPosts = await getAllPosts(0);
+        setAllPosts(fetchedPosts.data);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const menuItemContent = (postItem: IAllPosts) => {
     return (
       <div className={styles.menuItemContents}>
@@ -371,44 +400,36 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
     );
   };
 
-  let content;
+  const bookMarkUI = (postItem: IAllPosts) => {
+    return (
+      <div className={styles.bookmark}>
+        {!postItem?.bookmarkedUser?.includes(userDetails?._id) ? (
+          <div onClick={() => handleBookmarkPost(postItem._id)}>
+            <Bookmark />
+          </div>
+        ) : (
+          <div onClick={() => handleRemoveBookmarkPost(postItem._id)}>
+            <Bookmarked />
+          </div>
+        )}
+      </div>
+    );
+  };
 
-  if (isLoading) {
-    content = (
-      <Space direction="vertical" style={{ display: "flex" }} size={"small"}>
-        {Array.from([1, 2, 3, 4, 5, 6]).map((_, index) => (
-          <Card key={index}>
-            <Skeleton.Image
-              active={true}
-              style={{ width: 610, height: 350, marginBottom: "12px" }}
-            />
-            <Skeleton active={true} avatar paragraph={{ rows: 3 }} />
-          </Card>
-        ))}
-      </Space>
-    );
-  } else if (!allPosts.length) {
-    content = (
-      <Empty
-        image="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg"
-        imageStyle={{ height: 100, textAlign: "center" }}
-      >
-        <Button type="primary" onClick={() => setIsModalOpen(true)}>
-          Create Now
-        </Button>
-      </Empty>
-    );
-  } else {
-    content = allPosts.map((postItem: IAllPosts) => (
-      <div key={postItem.id}>
+  const uiCardContent = useCallback(
+    (postItem: IAllPosts) => {
+      return (
         <Card style={{ marginBottom: "8px" }}>
-          <ImageControl
-            src={postItem.photo ?? "/"}
-            alt=""
-            width={610}
-            height={350}
-            photo={postItem.photo}
-          />
+          <div className={styles.imageStyle}>
+            <ImageControl
+              src={postItem.photo ?? "/"}
+              alt=""
+              width={610}
+              height={350}
+              photo={postItem.photo}
+            />
+          </div>
+
           <div className={styles.userSectionMain}>
             <div className={styles.userImageContainer}>
               {postItem?.user?.profilePhoto ? (
@@ -450,31 +471,37 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
                 >
                   <MoreOutlined />
                 </Popover>
+
+                {bookMarkUI(postItem)}
               </div>
             ) : (
-              <>
-                {findBlockedUsers(postItem.user._id) ? (
-                  <div
-                    className={styles.blocked}
-                    onClick={() => handleUnBlockUser(postItem.user._id)}
-                  >
-                    <div>
-                      <CheckCircleTwoTone />
+              <div className={styles.bookmarkContainer}>
+                <div>
+                  {findBlockedUsers(postItem.user._id) ? (
+                    <div
+                      className={styles.blocked}
+                      onClick={() => handleUnBlockUser(postItem.user._id)}
+                    >
+                      <div>
+                        <CheckCircleTwoTone />
+                      </div>
+                      <div>{loading.isBlock ? "...Unblocking" : "Unblock"}</div>
                     </div>
-                    <div>{loading.isBlock ? "...Unblocking" : "Unblock"}</div>
-                  </div>
-                ) : (
-                  <div
-                    className={styles.blocked}
-                    onClick={() => handleBlockUser(postItem.user._id)}
-                  >
-                    <div>
-                      <StopTwoTone />
+                  ) : (
+                    <div
+                      className={styles.blocked}
+                      onClick={() => handleBlockUser(postItem.user._id)}
+                    >
+                      <div>
+                        <StopTwoTone />
+                      </div>
+                      <div>{loading.isBlock ? "...Blocking" : "Block"}</div>
                     </div>
-                    <div>{loading.isBlock ? "...Blocking" : "Block"}</div>
-                  </div>
-                )}
-              </>
+                  )}
+                </div>
+
+                {bookMarkUI(postItem)}
+              </div>
             )}
           </div>
           <div className={styles.postInfoContainer}>
@@ -515,6 +542,48 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
             {allComments(postItem)}
           </div>
         </Card>
+      );
+    },
+    [allPosts]
+  );
+
+  let content;
+
+  if (isLoading) {
+    content = (
+      <Space direction="vertical" style={{ display: "flex" }} size={"small"}>
+        {Array.from([1, 2, 3, 4, 5, 6]).map((_, index) => (
+          <Card key={index}>
+            <Skeleton.Image
+              active={true}
+              style={{ width: 610, height: 350, marginBottom: "12px" }}
+            />
+            <Skeleton active={true} avatar paragraph={{ rows: 3 }} />
+          </Card>
+        ))}
+      </Space>
+    );
+  } else if (!allPosts.length) {
+    content = (
+      <Empty
+        image="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg"
+        imageStyle={{ height: 100, textAlign: "center" }}
+      >
+        <Button type="primary" onClick={() => setIsModalOpen(true)}>
+          Create Now
+        </Button>
+      </Empty>
+    );
+  } else {
+    content = allPosts.map((postItem: IAllPosts) => (
+      <div key={postItem.id}>
+        {postItem.bookmarkedUser.includes(userDetails._id) ? (
+          <Badge.Ribbon text="Bookmarked" color="cyan">
+            {uiCardContent(postItem)}
+          </Badge.Ribbon>
+        ) : (
+          uiCardContent(postItem)
+        )}
       </div>
     ));
   }
