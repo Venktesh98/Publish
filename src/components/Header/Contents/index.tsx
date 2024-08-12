@@ -381,7 +381,7 @@ const HeaderContents = () => {
 
       const combineCategories = [...allCategories, ...postDetails.category];
       const filteredTags = combineCategories.reduce((acc, current) => {
-        const isDuplicate = acc.some(
+        const isDuplicate = acc.find(
           (tag: ICategoryDetails) => tag._id === current._id
         );
         if (!isDuplicate) {

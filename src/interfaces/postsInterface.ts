@@ -56,6 +56,7 @@ export interface IAllPosts {
   disLikesPercentage: string;
   daysAgo: string;
   photo: string;
+  bookmarkedUser: string[]
 }
 
 export interface IAllPostsProps {

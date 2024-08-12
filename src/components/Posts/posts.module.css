@@ -70,6 +70,8 @@
 
 .menuItem {
   cursor: pointer;
+  display: flex;
+  gap: 10px;
 }
 
 .menuItemContainer {
@@ -97,7 +99,7 @@
   cursor: pointer;
 }
 
-.blocked > :nth-child(1){
+.blocked > :nth-child(1) {
   margin-top: 0.5px;
 }
 
@@ -139,4 +141,20 @@
 .likeUnlike {
   display: flex !important;
   gap: 5px !important;
+}
+
+.bookmarkContainer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bookmark {
+  font-size: 25px;
+  margin-top: 6px;
+  cursor: pointer;
+}
+
+.imageStyle {
+  margin-top: 18px;
 }

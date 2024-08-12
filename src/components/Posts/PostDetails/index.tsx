@@ -188,42 +188,45 @@ const PostDetails = () => {
               </div>
             </div>
 
-            {postUserDetails?._id !== userDetails?._id && (
-              <div className={styles.userActions}>
-                <div>
-                  {userDetails?.following?.includes(postDetails?.user) ? (
-                    <Button
-                      type="primary"
-                      size="small"
-                      onClick={() =>
-                        handleUnFollowAUser(
-                          postDetails?.user as unknown as string
-                        )
-                      }
-                    >
-                      {UserEnumValues.UNFOLLOW}
-                    </Button>
-                  ) : (
-                    <Button
-                      type="primary"
-                      size="small"
-                      onClick={() =>
-                        handleFollowAUser(
-                          postDetails?.user as unknown as string
-                        )
-                      }
-                    >
-                      {UserEnumValues.FOLLOW}
-                    </Button>
-                  )}
+            <div className={styles.userDetailsContents}>
+              {postUserDetails?._id !== userDetails?._id && (
+                <div className={styles.userActions}>
+                  <div>
+                    {userDetails?.following?.includes(postDetails?.user) ? (
+                      <Button
+                        type="primary"
+                        size="small"
+                        onClick={() =>
+                          handleUnFollowAUser(
+                            postDetails?.user as unknown as string
+                          )
+                        }
+                      >
+                        {UserEnumValues.UNFOLLOW}
+                      </Button>
+                    ) : (
+                      <Button
+                        type="primary"
+                        size="small"
+                        onClick={() =>
+                          handleFollowAUser(
+                            postDetails?.user as unknown as string
+                          )
+                        }
+                      >
+                        {UserEnumValues.FOLLOW}
+                      </Button>
+                    )}
+                  </div>
                 </div>
-                <div onClick={() => setOpenDrawer(true)}>
-                  <CommentOutlined
-                    style={{ fontSize: "19px", cursor: "pointer" }}
-                  />
-                </div>
+              )}
+
+              <div onClick={() => setOpenDrawer(true)}>
+                <CommentOutlined
+                  style={{ fontSize: "19px", cursor: "pointer" }}
+                />
               </div>
-            )}
+            </div>
           </div>
 
           <div>
