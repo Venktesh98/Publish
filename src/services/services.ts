@@ -28,7 +28,7 @@ export const getAllPosts = async (currentPage: number) => {
   const { data } = await blogServiceAPI.get(
     `/posts?page=${currentPage}&pageSize=${10}`
   );
-  
+
   return {
     data: data.data.posts,
     isLastPage: data.data.isLastPage,
@@ -128,9 +128,27 @@ export const registerUser = async (payload: ISubmitSignupFormValues) => {
 };
 
 export const loginUser = async (payload: ILoginFormValues) => {
-  const { data } = await blogServiceAPI.post("/users/login", payload);
+  const { data } = await blogServiceAPI.post("/users/login", payload, {
+    withCredentials: true,
+  });
 
   return data.data;
+};
+
+export const logoutUser = async () => {
+  const { data } = await blogServiceAPI.post("/users/logout", {
+    withCredentials: true,
+  });
+
+  return data;
+};
+
+export const checkUserAuthentication = async () => {
+  const { data } = await blogServiceAPI.get("/users/check-auth", {
+    withCredentials: true,
+  });
+
+  return data;
 };
 
 export const loggedInUserProfile = async () => {
@@ -194,4 +212,3 @@ export const createNewCategory = async (payload: ICategoryPayload) => {
 
   return data;
 };
-
