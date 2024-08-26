@@ -21,6 +21,8 @@ import {
 } from "@/services/services";
 import { UserEnumValues } from "@/utils/constants";
 import { serializeDate } from "@/utils/helpers";
+import Bookmark from "@/utils/icons/Bookmark";
+import Bookmarked from "@/utils/icons/Bookmarked";
 import {
   CheckCircleTwoTone,
   CommentOutlined,
@@ -49,8 +51,6 @@ import ImageControl from "../shared/ImageControl";
 import PopOverControl from "../shared/PopOverControl";
 import Comments from "./Comments";
 import styles from "./posts.module.css";
-import Bookmark from "@/utils/icons/Bookmark";
-import Bookmarked from "@/utils/icons/Bookmarked";
 
 const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
   const { Title, Text } = Typography;
@@ -577,7 +577,7 @@ const PublishAllPosts = ({ isLoading }: IAllPostsProps) => {
   } else {
     content = allPosts.map((postItem: IAllPosts) => (
       <div key={postItem.id}>
-        {postItem.bookmarkedUser.includes(userDetails._id) ? (
+        {postItem.bookmarkedUser.includes(userDetails?._id) ? (
           <Badge.Ribbon text="Bookmarked" color="cyan">
             {uiCardContent(postItem)}
           </Badge.Ribbon>

@@ -1,6 +1,8 @@
 "use client";
 import HeaderLayout from "@/components/shared/HeaderLayout";
 import ImageControl from "@/components/shared/ImageControl";
+import { BlogCtx } from "@/context/blogContext";
+import { useImageUpload } from "@/hooks/useImageUpload";
 import { IUpdateUserFields } from "@/interfaces/formInterface";
 import { IUserDetails } from "@/interfaces/postsInterface";
 import { loggedInUserProfile, updateUserDetails } from "@/services/services";
@@ -12,20 +14,9 @@ import {
   UploadOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import {
-  Button,
-  Card,
-  Form,
-  FormInstance,
-  Input,
-  Progress,
-  Upload,
-  message,
-} from "antd";
-import { useContext, useEffect, useRef, useState } from "react";
+import { Button, Card, Form, Input, Progress, Upload, message } from "antd";
+import { useContext, useEffect, useState } from "react";
 import styles from "./userDetails.module.css";
-import { useImageUpload } from "@/hooks/useImageUpload";
-import { BlogCtx } from "@/context/blogContext";
 
 const initialValues = {
   firstName: "",

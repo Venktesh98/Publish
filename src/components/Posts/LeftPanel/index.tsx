@@ -1,3 +1,4 @@
+import { BlogCtx } from "@/context/blogContext";
 import {
   BulbTwoTone,
   ContactsTwoTone,
@@ -10,9 +11,8 @@ import {
 } from "@ant-design/icons";
 import { Typography } from "antd";
 import Link from "next/link";
-import styles from "./leftPanel.module.css";
 import { useContext } from "react";
-import { BlogCtx } from "@/context/blogContext";
+import styles from "./leftPanel.module.css";
 
 const LeftPanel = () => {
   const { setIsModalOpen } = useContext(BlogCtx);
@@ -30,7 +30,7 @@ const LeftPanel = () => {
 
         <div className={styles.type}>
           <SaveTwoTone style={{ fontSize: "18px" }} />
-          <Link href="#" className={styles.links}>
+          <Link href="/bookmarks" className={styles.links}>
             Bookmarks
           </Link>
         </div>

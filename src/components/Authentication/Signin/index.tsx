@@ -4,11 +4,14 @@ import { ILoginFormValues } from "@/interfaces/formInterface";
 import { loginUser } from "@/services/services";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, Card, Checkbox, Flex, Form, Input, message } from "antd";
+import { CheckboxChangeEvent } from "antd/es/checkbox";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import styles from "./signin.module.css";
 
 const PublishSignIn = () => {
+  const [rememberMe, setRememberMe] = useState<boolean>(false);
   const router = useRouter();
 
   const handleFormLogin = async (values: ILoginFormValues) => {
@@ -22,6 +25,10 @@ const PublishSignIn = () => {
     } catch (error: any) {
       message.error(error?.response?.data?.message ?? error.msg);
     }
+  };
+
+  const handleRememberMe = (event: CheckboxChangeEvent) => {
+    setRememberMe(event.target.checked);
   };
 
   return (
@@ -52,9 +59,11 @@ const PublishSignIn = () => {
               />
             </Form.Item>
             <Form.Item>
-              <Form.Item name="remember" valuePropName="checked" noStyle>
+              <Form.Item name="rememberMe" valuePropName="checked" noStyle>
                 <div className={styles.rememberContainer}>
-                  <Checkbox>Remember me</Checkbox>
+                <Checkbox onChange={handleRememberMe} checked={rememberMe}>
+                    Remember me
+                  </Checkbox>
                   <Link href="#">Forgot password</Link>
                 </div>
               </Form.Item>

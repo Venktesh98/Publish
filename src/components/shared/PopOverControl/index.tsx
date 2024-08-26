@@ -1,9 +1,14 @@
 import { IPopOverProps } from "@/interfaces/popOverInterface";
 import { Popover } from "antd";
 
-const PopOverControl = ({ children, title, content }: IPopOverProps) => {
+const PopOverControl = ({
+  children,
+  title,
+  content,
+  placement = "bottom",
+}: IPopOverProps) => {
   return (
-    <Popover placement="bottom" title={title} content={content}>
+    <Popover placement={placement} title={title} content={content}>
       {children}
     </Popover>
   );

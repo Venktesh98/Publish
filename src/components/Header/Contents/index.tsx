@@ -13,6 +13,7 @@ import {
   editAPost,
   getAllPosts,
   getSearchedPosts,
+  logoutUser,
 } from "@/services/services";
 import {
   EditTwoTone,
@@ -163,9 +164,13 @@ const HeaderContents = () => {
     router.push("/signup");
   };
 
-  const handleRedirectToUserLogin = () => {
-    sessionStorage.removeItem("token");
-    router.push("/signin");
+  const handleRedirectToUserLogin = async () => {
+    const data = await logoutUser();
+    if (data.status === 200) {
+      sessionStorage.removeItem("token");
+      message.success("Logged out")
+      router.push("/signin");
+    }
   };
 
   const redirectToHomePage = () => {
